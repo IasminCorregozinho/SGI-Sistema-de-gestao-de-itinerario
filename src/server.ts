@@ -6,5 +6,5 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor SGI rodando estruturado na porta ${PORT}`);
+    console.log(`Servidor SGI rodando na porta ${PORT}`);
 });
