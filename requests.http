@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:3000
+
+    ### Register User
+# @name registerUser
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+    "name": "Admin Coordenador3",
+    "matricula": "Admin12367",
+    "senha": "123456",
+    "perfil_id": 5
+}
+
+### Login User
+# @name loginUser
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+    "perfil_id": 2,
+    "matricula": "admin123",
+    "senha": "123456"
+}
+
+### List Profiles
+GET {{baseUrl}}/users/perfis
+Content-Type: application/json
+
+### Create Profile (Requires Profile 2 - Coordination)
+POST {{baseUrl}}/users/perfis
+Content-Type: application/json
+
+{
+    "nome": "New Profile",
+    "matricula": "NewProfile123",
+    "senha": "password123"
+}
+
+### Delete Profile
+# Replace :id with an actual ID
+DELETE {{baseUrl}}/users/perfis/3
+Content-Type: application/json

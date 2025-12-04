@@ -1,0 +1,25 @@
+export interface Ativo {
+    id?: number;
+    patrimonio: string;
+    id_tipo_ativo: number;
+    id_status: number;
+    id_localizacao: number;
+    id_responsavel: number;
+    marca_modelo?: string;
+    data_aquisicao?: Date;
+    info_tecnicas?: string;
+    obs?: string;
+}
+
+// interface para o Histórico
+export interface HistoricoAtivo {
+    ativo_id: number;
+    usuario_alteracao: number;
+    status_anterior: number;
+    status_novo: number;
+    localizacao_anterior: number;
+    localizacao_novo: number;
+    responsavel_anterior: number;
+    responsavel_novo: number;
+    observacao: string;
+}
