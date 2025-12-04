@@ -20,12 +20,12 @@ export async function createProfile(nome: string, matricula: string, senha: stri
   try {
     await client.query('BEGIN');
 
-    // 1. Check if user exists
+    // 1. Verificar se o usuário existe
     const userCheck = await client.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
     let userId;
 
     if (userCheck.rows.length === 0) {
-      // 2. Create user with NULL perfil_id
+      // 2. Criar usuário com perfil_id NULL
       const newUser = await client.query(
         "INSERT INTO responsavel (nome, matricula, senha, perfil_id) VALUES ($1, $2, $3, NULL) RETURNING responsavel_id",
         [nome, matricula, senha]
@@ -35,14 +35,14 @@ export async function createProfile(nome: string, matricula: string, senha: stri
       userId = userCheck.rows[0].responsavel_id;
     }
 
-    // 3. Create profile
+    // 3. Criar perfil
     const newProfile = await client.query(
       "INSERT INTO perfis (matricula) VALUES ($1) RETURNING *",
       [matricula]
     );
     const profileId = newProfile.rows[0].perfil_id;
 
-    // 4. Update user with new perfil_id
+    // 4. Atualizar usuário com novo perfil_id
     await client.query(
       "UPDATE responsavel SET perfil_id = $1 WHERE responsavel_id = $2",
       [profileId, userId]
@@ -64,13 +64,13 @@ export async function deleteProfile(id: number) {
   try {
     await client.query('BEGIN');
 
-    // 1. Unlink users referencing this profile
+    // 1. Desvincular usuários que referenciam este perfil
     await client.query(
       "UPDATE responsavel SET perfil_id = NULL WHERE perfil_id = $1",
       [id]
     );
 
-    // 2. Delete the profile
+    // 2. Excluir o perfil
     const result = await client.query(
       "DELETE FROM perfis WHERE perfil_id = $1 RETURNING *",
       [id]

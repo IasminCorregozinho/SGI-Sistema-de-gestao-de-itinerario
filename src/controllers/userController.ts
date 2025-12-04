@@ -4,7 +4,7 @@ import * as userService from "../services/userService";
 export async function register(req: Request, res: Response) {
   try {
     const user = await userService.registerUser(req.body);
-    return res.status(201).json({ message: "Usuário criado", user });
+    return res.status(201).json({ message: "Usuário criado com sucesso", user });
   } catch (err: any) {
     return res.status(400).json({ error: err.message });
   }
@@ -14,7 +14,7 @@ export async function login(req: Request, res: Response) {
   try {
     const { matricula, senha } = req.body;
     const user = await userService.loginUser(matricula, senha);
-    return res.status(200).json({ message: "Sucesso! Login bem-sucedido", user });
+    return res.status(200).json({ message: "Login realizado com sucesso", user });
   } catch (err: any) {
     return res.status(401).json({ error: err.message });
   }
