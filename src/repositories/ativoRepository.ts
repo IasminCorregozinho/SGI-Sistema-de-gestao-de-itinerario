@@ -5,13 +5,13 @@ import { Ativo, HistoricoAtivo } from '../models/ativo';
 
 // Buscar um ativo pelo ID
 export async function findById(id: number): Promise<Ativo | null> {
-    const result = await pool.query('SELECT * FROM ATIVO WHERE id = $1', [id]);
+    const result = await pool.query('SELECT * FROM ATIVO WHERE ativo_id = $1', [id]);
     
     // Mapear o retorno do banco 
     if (result.rows.length > 0) {
         const row = result.rows[0];
         return {
-            id: row.id,
+            id: row.ativo_id,
             patrimonio: row.patrimonio,
             id_tipo_ativo: row.tipo_ativo, 
             id_status: row.status,
@@ -38,10 +38,10 @@ export async function create(ativo: Ativo): Promise<Ativo> {
 export async function update(id: number, ativo: Ativo): Promise<Ativo> {
     const query = `
         UPDATE ATIVO SET 
-            tipo_ativo = $1, status = $2, localizacao = $3, responsavel = $4, patrimonio = $5, observacoes = $6
-        WHERE id = $7 RETURNING *
+            tipo_ativo = $1, status = $2, localizacao = $3, responsavel = $4, observacoes = $5
+        WHERE ativo_id = $6 RETURNING *
     `;
-    const values = [ativo.id_tipo_ativo, ativo.id_status, ativo.id_localizacao, ativo.id_responsavel, ativo.patrimonio, ativo.obs, id];
+    const values = [ativo.id_tipo_ativo, ativo.id_status, ativo.id_localizacao, ativo.id_responsavel, ativo.obs, id];
     const result = await pool.query(query, values);
     return result.rows[0];
 }

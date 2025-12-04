@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Cadastro de Ativos</title>
+    <style>
+        /* CSS*/
+        body { font-family: Arial, sans-serif; 
+        background-color: #d0d0e9; 
+        display: flex; 
+        justify-content: center; 
+        padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; margin-top: 20px; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .msg { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; text-align: center; }
+        .sucesso { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cadastrar Novo Ativo</h2>
+    
+    <form id="formCadastro">
+        
+        <label>Nº Patrimônio:</label>
+        <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
+
+        <label>Tipo de Ativo:</label>
+        <select id="tipo_ativo">
+            <option value="10">Computador</option>
+            <option value="11">Monitor</option>
+            <option value="12">Impressora</option>
+            <option value=>Notebook</option>
+            <option value=>Mouse</option>
+            <option value=>Teclado</option>
+
+        </select>
+
+        <label>Marca / Modelo:</label>
+        <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
+
+        <label>Status:</label>
+        <select id="status">
+            <option value="13">Em uso</option>
+            <option value="14">Em manutenção</option>
+            <option value="15">Em estoque</option>
+        </select>
+
+        <label>Localização:</label>
+        <select id="localizacao">
+            <option value="11">Recursos Humanos</option>
+            <option value="12">Financeiro</option>
+            <option value="15">Recepção Central</option>
+        </select>
+
+        <label>Responsável:</label>
+        <select id="responsavel">
+            <option value="1">Usuário Suporte</option>
+            <option value="4">Fabiana Chaves</option>
+        </select>
+
+        <label>Observações:</label>
+        <textarea id="obs" rows="3"></textarea>
+
+        <button type="submit">Salvar Cadastro</button>
+    </form>
+
+    <div id="mensagem" class="msg"></div>
+</div>
+
+<script>
+    // LÓGICA DO FRONTEND (JavaScript Puro)
+    const form = document.getElementById('formCadastro');
+    const msgDiv = document.getElementById('mensagem');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Não deixa a página recarregar
+
+        // 1. Pega os dados dos campos
+        const dados = {
+            patrimonio: document.getElementById('patrimonio').value,
+            id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+            marca_modelo: document.getElementById('marca_modelo').value,
+            id_status: parseInt(document.getElementById('status').value),
+            id_localizacao: parseInt(document.getElementById('localizacao').value),
+            id_responsavel: parseInt(document.getElementById('responsavel').value),
+            obs: document.getElementById('obs').value
+        };
+
+        // 2. Envia para o Backend (Fetch API)
+        try {
+            const response = await fetch('/ativos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await response.json();
+
+            if (response.ok) {
+                // Sucesso
+                msgDiv.innerText = "✅ Ativo cadastrado com sucesso!";
+                msgDiv.className = "msg sucesso";
+                msgDiv.style.display = "block";
+                form.reset(); // Limpa os campos
+            } else {
+                // Erro do servidor (ex: Patrimônio duplicado)
+                throw new Error(resultado.error || "Erro desconhecido");
+            }
+        } catch (erro) {
+            // Erro de conexão ou lógica
+            msgDiv.innerText = "❌ Erro: " + erro.message;
+            msgDiv.className = "msg erro";
+            msgDiv.style.display = "block";
+        }
+    });
+</script>
+
+</body>
+</html>
