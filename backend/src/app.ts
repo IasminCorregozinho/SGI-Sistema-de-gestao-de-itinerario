@@ -1,8 +1,10 @@
 import express from 'express';
 import ativoRoutes from './routes/ativoRoutes';
 import userRoutes from './routes/userRoutes';
+import cors from 'cors';
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use('/ativos', ativoRoutes);
 app.use('/users', userRoutes);
