@@ -1,4 +1,5 @@
 import app from './app';
+console.log('Iniciando servidor...');
 import dotenv from 'dotenv';
 
 dotenv.config();
