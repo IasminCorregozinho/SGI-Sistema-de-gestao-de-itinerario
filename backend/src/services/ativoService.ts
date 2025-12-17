@@ -43,3 +43,20 @@ export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
     const ativoAtualizado = await ativoRepo.update(id, dadosNovos);
     return ativoAtualizado;
 }
+
+import * as AtivoRepository from '../repositories/ativoRepository';
+
+export async function getDashboardData() {
+    const stats = await AtivoRepository.getDashboardStats();
+
+    return {
+        total: stats?.total || 0,
+        estoque: stats?.estoque || 0,
+        manutencao: stats?.manutencao || 0,
+        descartados: stats?.descartados || 0
+    };
+}
+
+export async function getMovimentacoesRecentes() {
+    return await AtivoRepository.getUltimasMovimentacoes();
+}
