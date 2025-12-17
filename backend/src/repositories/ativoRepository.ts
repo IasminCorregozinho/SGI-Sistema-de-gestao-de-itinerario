@@ -78,3 +78,51 @@ export async function createHistorico(hist: HistoricoAtivo): Promise<void> {
         hist.observacao
     ]);
 }
+
+// FUNÇÃO DO DASHBOARD 
+
+export async function getDashboardStats() {
+    
+    const query = `
+        SELECT 
+            -- Conta todas as linhas da tabela (Total de Ativos)
+            COUNT(*)::int as total,
+            
+            -- Soma apenas se status for 15 (Em estoque)
+            COALESCE(SUM(CASE WHEN status = 15 THEN 1 ELSE 0 END), 0)::int as estoque,
+            
+            -- Soma apenas se status for 14 (Em manutenção)
+            COALESCE(SUM(CASE WHEN status = 14 THEN 1 ELSE 0 END), 0)::int as manutencao,
+            
+            -- Soma apenas se status for 16 (Descartado)
+            COALESCE(SUM(CASE WHEN status = 16 THEN 1 ELSE 0 END), 0)::int as descartados
+            
+        FROM ATIVO
+    `;
+
+    try {
+        const result = await pool.query(query);
+        return result.rows[0]; 
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas do dashboard:', error);
+        throw error; 
+    }
+}
+
+export async function getUltimasMovimentacoes() {
+    const query = `
+        SELECT 
+            a.patrimonio as ativo,      
+            h.usuario_alteracao as usuario,
+            s.descricao as acao,       
+            h.data_movimentacao as data
+        FROM historico_ativo h
+        INNER JOIN ATIVO a ON h.ativo_id = a.ativo_id
+        INNER JOIN STATUS_ATIVO s ON h.status_novo = s.status_id
+        ORDER BY h.data_movimentacao DESC
+        LIMIT 5
+    `;
+
+    const result = await pool.query(query);
+    return result.rows;
+}

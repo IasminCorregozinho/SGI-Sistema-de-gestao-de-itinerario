@@ -11,5 +11,8 @@ router.post('/', ativoController.criar);
 router.put('/:id', ativoController.editar);
 // Adicionando rota GET para "consulta"
 router.get('/', ativoController.listar);
+router.get('/dashboard-kpis', ativoController.getDashboardStats);
+router.get('/movimentacoes-recentes', ativoController.getMovimentacoes);
 
 export default router;
+
