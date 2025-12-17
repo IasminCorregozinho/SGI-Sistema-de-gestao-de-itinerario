@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 9999 !important;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 450px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+            <img src="https://www.ifg.edu.br/images/ifg/logo/logo-ifg-vertical.png" alt="Logo IFG"
+                style="width: 140px; margin-bottom: 20px; align-self: center;">
+
+            <nav>
+                <a href="#" class="menu-item">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" onclick="abrirModal()" class="menu-item">
+                    <i class="fa-solid fa-plus"></i> Cadastrar Ativo
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fa-solid fa-list"></i> Listagem
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fa-solid fa-gear"></i> Configurações
+                </a>
+                <a href="#" class="menu-item" style="margin-top: auto;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content">
+
+            <header>
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Visão geral dos ativos de TI</p>
+                </div>
+
+                <div class="actions">
+                    <input type="text" class="search-bar" placeholder="🔍 Buscar por Tag, Serial ou Nome...">
+
+                    <button class="btn-primary" onclick="abrirModal()">Novo Ativo</button>
+
+                    <a href="" class="btn-primary"><i></i>Editar Ativo</a>
+                    <a href="" class="btn-primary"><i></i>Histórico Ativo</a>
+                    <a href="" class="btn-primary"><i></i>Listagem de Ativos</a>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="card">
+                    <span class="card-label">Total de Ativos</span>
+                    <div class="card-value" id="kpi-total">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Em Estoque</span>
+                    <div class="card-value text-blue" id="kpi-estoque">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Em Manutenção</span>
+                    <div class="card-value text-red" id="kpi-manutencao">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Descartados</span>
+                    <div class="card-value" style="color: #7f8c8d;" id="kpi-descartado">---</div>
+                </div>
+            </section>
+
+            <section class="charts-grid">
+                <div class="card">
+                    <h3>Status dos Ativos</h3>
+                    <div class="chart-area" style="position: relative; height: 250px;">
+                        <canvas id="meuGraficoStatus"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Ativos por Categoria</h3>
+                    <div class="chart-area" style="position: relative; height: 250px;">
+                        <canvas id="meuGraficoCategoria"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="recent-activity card">
+                <h3>Últimas Movimentações</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Usuário</th>
+                            <th>Ação</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="modalCadastro" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="fecharModal()">&times;</span>
+            <h2>Cadastrar Novo Ativo</h2>
+
+            <form id="formAtivo" onsubmit="salvarAtivo(event)">
+                <div class="form-group">
+                    <label>Patrimônio / Tag</label>
+                    <input type="text" id="patrimonio" required placeholder="Ex: COMP-001">
+                </div>
+
+                <div class="form-group">
+                    <label>Categoria (ID)</label>
+                    <input type="number" id="tipo_ativo" required placeholder="Ex: 1 (Notebook)">
+                </div>
+
+                <div class="form-group">
+                    <label>Status (ID)</label>
+                    <select id="status">
+                        <option value="15">Em Estoque</option>
+                        <option value="13">Em Uso</option>
+                        <option value="14">Manutenção</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Localização (ID)</label>
+                    <input type="number" id="localizacao" placeholder="ID da Sala">
+                </div>
+
+                <div class="form-group">
+                    <label>Responsável (ID)</label>
+                    <input type="number" id="responsavel" placeholder="ID do Usuário">
+                </div>
+
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="observacoes" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-salvar">Salvar Ativo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 1. FUNÇÕES DO MODAL (NO TOPO)
+        function abrirModal() {
+            const modal = document.getElementById('modalCadastro');
+            if (modal) {
+                modal.style.display = 'flex';
+            } else {
+                console.error("Erro: modalCadastro não encontrado");
+            }
+        }
+
+        function fecharModal() {
+            const modal = document.getElementById('modalCadastro');
+            if (modal) modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalCadastro');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+
+        // 2. LÓGICA DO DASHBOARD
+        const API_BASE = 'http://localhost:3000/ativos';
+
+        async function carregarDashboard() {
+            try {
+                // KPIs
+                const responseKpi = await fetch(`${API_BASE}/dashboard-kpis`);
+                let dados = {};
+
+                if (responseKpi.ok) {
+                    dados = await responseKpi.json();
+
+                    if (document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = dados.total || 0;
+                    if (document.getElementById('kpi-estoque')) document.getElementById('kpi-estoque').innerText = dados.estoque || 0;
+                    if (document.getElementById('kpi-manutencao')) document.getElementById('kpi-manutencao').innerText = dados.manutencao || 0;
+                    if (document.getElementById('kpi-descartado')) document.getElementById('kpi-descartado').innerText = dados.descartados || 0;
+
+                    // Gráfico
+                    if (typeof Chart !== 'undefined' && document.getElementById('meuGraficoStatus')) {
+                        const ctxStatus = document.getElementById('meuGraficoStatus').getContext('2d');
+                        if (window.graficoStatus) window.graficoStatus.destroy();
+
+                        window.graficoStatus = new Chart(ctxStatus, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Em Estoque', 'Em Uso', 'Manutenção', 'Descartado'],
+                                datasets: [{
+                                    data: [
+                                        dados.estoque || 0,
+                                        (dados.total - (dados.estoque + dados.manutencao + dados.descartados)) || 0,
+                                        dados.manutencao || 0,
+                                        dados.descartados || 0
+                                    ],
+                                    backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#95a5a6'],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'right'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // Tabela
+                const responseMov = await fetch(`${API_BASE}/movimentacoes-recentes`);
+                if (responseMov.ok) {
+                    const listaMovimentacoes = await responseMov.json();
+                    const tbody = document.querySelector('tbody');
+                    if (tbody) {
+                        tbody.innerHTML = '';
+
+                        if (listaMovimentacoes.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhuma movimentação recente.</td></tr>';
+                        } else {
+                            listaMovimentacoes.forEach(mov => {
+                                const dataFormatada = new Date(mov.data).toLocaleString('pt-BR');
+                                let corBadge = 'background-color: #e0f7fa; color: #006064;';
+
+                                if (mov.acao && mov.acao.toLowerCase().includes('manutenção')) {
+                                    corBadge = 'background-color: #fff3cd; color: #856404;';
+                                }
+                                if (mov.acao && mov.acao.toLowerCase().includes('descartado')) {
+                                    corBadge = 'background-color: #f8d7da; color: #721c24;';
+                                }
+
+                                const linha = `
+                                <tr>
+                                    <td>${mov.ativo}</td>
+                                    <td>${mov.usuario}</td>
+                                    <td><span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; ${corBadge}">${mov.acao}</span></td>
+                                    <td>${dataFormatada}</td>
+                                </tr>`;
+                                tbody.innerHTML += linha;
+                            });
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Erro ao atualizar dashboard:', error);
+            }
+        }
+
+        // 3. FUNÇÃO DE SALVAR
+        async function salvarAtivo(event) {
+            event.preventDefault();
+
+            const dadosAtivo = {
+                patrimonio: document.getElementById('patrimonio').value,
+                id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+                id_status: parseInt(document.getElementById('status').value),
+                id_localizacao: parseInt(document.getElementById('localizacao').value),
+                id_responsavel: parseInt(document.getElementById('responsavel').value),
+                obs: document.getElementById('observacoes').value
+            };
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosAtivo)
+                });
+
+                if (response.ok) {
+                    alert('Ativo cadastrado com sucesso!');
+                    fecharModal();
+                    document.getElementById('formAtivo').reset();
+                    carregarDashboard();
+                } else {
+                    alert('Erro ao salvar.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro de conexão.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarDashboard);
+    </script>
+</body>
+
+</html>
