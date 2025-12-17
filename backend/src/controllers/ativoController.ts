@@ -31,3 +31,25 @@ export async function listar(req: Request, res: Response) {
         return res.status(500).json({ error: error.message });
     }
 }
+
+export async function getDashboardStats(req: Request, res: Response) {
+    try {
+        const dados = await ativoService.getDashboardData();
+
+        res.status(200).json(dados);
+        
+    } catch (error) {
+        console.error('Erro no controller de dashboard:', error);
+        res.status(500).json({ message: 'Erro ao buscar dados do dashboard' });
+    }
+}
+
+export async function getMovimentacoes(req: Request, res: Response) {
+    try {
+        const movimentacoes = await ativoService.getMovimentacoesRecentes();
+        res.status(200).json(movimentacoes);
+    } catch (error) {
+        console.error('Erro ao buscar movimentações:', error);
+        res.status(500).json({ message: 'Erro interno ao buscar histórico' });
+    }
+}
