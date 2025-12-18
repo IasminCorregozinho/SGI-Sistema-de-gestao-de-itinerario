@@ -31,7 +31,8 @@
             background: white;
             padding: 30px;
             border-radius: 10px;
-            width: 450px;
+            width: 700px;
+            max-width: 90%;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
@@ -40,6 +41,73 @@
             font-size: 28px;
             cursor: pointer;
             font-weight: bold;
+        }
+
+        /* Form Grid Layout */
+        #formAtivo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+            /* Let grid gap handle spacing */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        .btn-salvar {
+            grid-column: span 2;
+            padding: 12px;
+            background-color: #30933C;
+            /* IFG Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-salvar:hover {
+            background-color: #1f6b29;
+        }
+
+        @media (max-width: 768px) {
+            .modal-box {
+                width: 95%;
+                padding: 20px;
+            }
+
+            #formAtivo {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .span-2 {
+                grid-column: span 1;
+            }
         }
     </style>
 </head>
@@ -164,35 +232,51 @@
 
             <form id="formAtivo" onsubmit="salvarAtivo(event)">
                 <div class="form-group">
-                    <label>Patrimônio / Tag</label>
-                    <input type="text" id="patrimonio" required placeholder="Ex: COMP-001">
+                    <label>Nº Patrimônio</label>
+                    <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Categoria (ID)</label>
-                    <input type="number" id="tipo_ativo" required placeholder="Ex: 1 (Notebook)">
-                </div>
-
-                <div class="form-group">
-                    <label>Status (ID)</label>
-                    <select id="status">
-                        <option value="15">Em Estoque</option>
-                        <option value="13">Em Uso</option>
-                        <option value="14">Manutenção</option>
+                    <label>Tipo de Ativo</label>
+                    <select id="tipo_ativo">
+                        <option value="10">Computador</option>
+                        <option value="11">Monitor</option>
+                        <option value="12">Impressora</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Localização (ID)</label>
-                    <input type="number" id="localizacao" placeholder="ID da Sala">
+                    <label>Marca / Modelo</label>
+                    <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
                 </div>
 
                 <div class="form-group">
-                    <label>Responsável (ID)</label>
-                    <input type="number" id="responsavel" placeholder="ID do Usuário">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="13">Em uso</option>
+                        <option value="14">Em manutenção</option>
+                        <option value="15">Em estoque</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
+                    <label>Localização</label>
+                    <select id="localizacao">
+                        <option value="11">Recursos Humanos</option>
+                        <option value="12">Financeiro</option>
+                        <option value="15">Recepção Central</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <select id="responsavel">
+                        <option value="1">Usuário Suporte</option>
+                        <option value="4">Fabiana Chaves</option>
+                    </select>
+                </div>
+
+                <div class="form-group span-2">
                     <label>Observações</label>
                     <textarea id="observacoes" rows="3"></textarea>
                 </div>
@@ -322,6 +406,7 @@
             const dadosAtivo = {
                 patrimonio: document.getElementById('patrimonio').value,
                 id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+                marca_modelo: document.getElementById('marca_modelo').value,
                 id_status: parseInt(document.getElementById('status').value),
                 id_localizacao: parseInt(document.getElementById('localizacao').value),
                 id_responsavel: parseInt(document.getElementById('responsavel').value),
