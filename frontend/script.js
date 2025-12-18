@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // 1. Limpar mensagens de erro anteriores
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.style.display = 'none';
+        errorDiv.innerText = '';
+
         const matricula = matriculaInput.value;
         const senha = senhaInput.value;
 
@@ -27,16 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert((data.message || 'Login com sucesso!'));
-                console.log('Dados do usuário:', data);
-                // Redirecionar para o dashboard
+                // SUCESSO: Redireciona para o Dashboard
+                console.log('Login com sucesso, redirecionando...');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Erro no login: ' + (data.error || 'Falha desconhecida'));
+                // ERRO: Mostrar mensagem no container
+                errorDiv.innerText = "Nome de usuário ou senha errados. Por favor tente outra vez.";
+                errorDiv.style.display = 'block';
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
-            alert('Erro de conexão com o servidor.');
+            // Erros genéricos de conexão
+            errorDiv.innerText = "Erro de conexão com o servidor. Tente novamente mais tarde.";
+            errorDiv.style.display = 'block';
         }
     });
 });
