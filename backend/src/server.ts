@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-//função de inicialização para usar async/await
+// Função de inicialização para usar async/await
 
 async function iniciarServidor() {
     console.log('Tentando conectar ao banco de dados...');
@@ -24,7 +24,7 @@ async function iniciarServidor() {
     } catch (error) {
         console.error('[ERRO] Não foi possível conectar ao banco de dados.');
         console.error('Detalhes do erro:', error);
-        // Encerra o processo com erro para não ficar rodando "bêbado"
+        // Encerra o processo com erro para não ficar rodando instável
         process.exit(1);
     }
 }

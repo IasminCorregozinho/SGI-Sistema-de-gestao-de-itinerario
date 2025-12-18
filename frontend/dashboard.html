@@ -4,8 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGI - Dashboard</title>
+    <title>SGI :: Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -44,8 +49,10 @@
     <div class="dashboard-layout">
 
         <aside class="sidebar">
-            <img src="https://www.ifg.edu.br/images/ifg/logo/logo-ifg-vertical.png" alt="Logo IFG"
-                style="width: 140px; margin-bottom: 20px; align-self: center;">
+            <div class="logo-area" style="text-align: center; margin-bottom: 2rem;">
+                <img src="images/logo_ifg.png" alt="Logo IFG"
+                    style="width: 100%; max-width: 140px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            </div>
 
             <nav>
                 <a href="#" class="menu-item">
@@ -60,7 +67,7 @@
                 <a href="#" class="menu-item">
                     <i class="fa-solid fa-gear"></i> Configurações
                 </a>
-                <a href="#" class="menu-item" style="margin-top: auto;">
+                <a href="#" class="menu-item" style="margin-top: auto;" onclick="logout()">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
                 </a>
             </nav>
@@ -75,13 +82,21 @@
                 </div>
 
                 <div class="actions">
-                    <input type="text" class="search-bar" placeholder="🔍 Buscar por Tag, Serial ou Nome...">
+                    <input type="text" class="search-bar" placeholder="Buscar por Tag, Serial ou Nome...">
 
-                    <button class="btn-primary" onclick="abrirModal()">Novo Ativo</button>
+                    <button class="btn-primary" onclick="abrirModal()">
+                        <i class="fa-solid fa-plus"></i> Novo Ativo
+                    </button>
 
-                    <a href="" class="btn-primary"><i></i>Editar Ativo</a>
-                    <a href="" class="btn-primary"><i></i>Histórico Ativo</a>
-                    <a href="" class="btn-primary"><i></i>Listagem de Ativos</a>
+                    <a href="" class="btn-primary">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar Ativo
+                    </a>
+                    <a href="" class="btn-primary">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Histórico Ativo
+                    </a>
+                    <a href="" class="btn-primary">
+                        <i class="fa-solid fa-list"></i> Listagem Ativos
+                    </a>
                 </div>
             </header>
 
@@ -203,7 +218,7 @@
             if (modal) modal.style.display = 'none';
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('modalCadastro');
             if (event.target == modal) {
                 fecharModal();
@@ -334,6 +349,12 @@
                 console.error('Erro:', error);
                 alert('Erro de conexão.');
             }
+        }
+
+        // 4. FUNÇÃO DE LOGOUT
+        function logout() {
+            // Redireciona para a tela de login
+            window.location.href = 'index.html';
         }
 
         document.addEventListener('DOMContentLoaded', carregarDashboard);
