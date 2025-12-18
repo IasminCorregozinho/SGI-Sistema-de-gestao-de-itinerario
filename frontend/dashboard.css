@@ -1,17 +1,33 @@
 /* dashboard.css */
 
+/* Global Reset & Typography */
+:root {
+    --ifg-green: #30933C;
+    --ifg-green-dark: #1f6b29;
+    --ifg-red: #EA3636;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --bg-light: #f8fafc;
+    --white: #ffffff;
+    --border-color: #e2e8f0;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --transition-speed: 0.3s;
+}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-body);
 }
 
 body {
-    background-color: #F4F6F8;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
     height: 100vh;
-    overflow: hidden; /* Evita barra de rolagem dupla */
+    overflow: hidden;
+    /* Evita barra de rolagem dupla */
 }
 
 .dashboard-layout {
@@ -22,40 +38,43 @@ body {
 /* Sidebar */
 .sidebar {
     width: 250px;
-    background-color: #096d33;
-    color: white;
+    background-color: var(--ifg-green);
+    color: var(--white);
     display: flex;
     flex-direction: column;
     padding: 20px;
 }
 
 .sidebar h2 {
+    font-family: var(--font-heading);
     font-size: 20px;
     margin-bottom: 40px;
     text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding-bottom: 10px;
 }
 
 .menu-item {
     padding: 15px;
-    color: white;
+    color: var(--white);
     text-decoration: none;
     display: block;
     border-radius: 8px;
     margin-bottom: 5px;
-    transition: background 0.3s;
+    transition: background var(--transition-speed);
+    font-weight: 500;
 }
 
 .menu-item:hover {
-    background-color: #0b8a40;
+    background-color: var(--ifg-green-dark);
 }
 
 /* Área de Conteúdo Principal */
 .content {
     flex: 1;
     padding: 2rem;
-    overflow-y: auto; /* Apenas o conteúdo rola, sidebar fixa */
+    overflow-y: auto;
+    /* Apenas o conteúdo rola, sidebar fixa */
 }
 
 /* Cabeçalho */
@@ -67,12 +86,14 @@ header {
 }
 
 header h1 {
-    font-size: 24px;
-    color: #333;
+    font-family: var(--font-heading);
+    font-size: 28px;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
 header p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
@@ -87,59 +108,78 @@ header p {
     padding: 10px;
     width: 300px;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
+    background-color: var(--white);
+    font-family: var(--font-body);
 }
 
 .btn-primary {
-    background-color: #096d33;
-    color: white;
+    background-color: var(--ifg-green);
+    color: var(--white);
     padding: 10px 20px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-weight: bold;
-    text-decoration: none; 
-    display: inline-block;
-    transition: background 0.2s;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    /* Better for centering with icons */
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    /* Enforce uniform size */
+    text-align: center;
+    transition: all var(--transition-speed);
+    font-family: var(--font-heading);
 }
 
 .btn-primary:hover {
-    background-color: #064f24;
+    background-color: var(--ifg-green-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(48, 147, 60, 0.2);
 }
 
 /* Cards de KPI (Números grandes) */
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 2rem;
 }
 
 .card {
-    background: white;
+    background: var(--white);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .card-label {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 12px;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 600;
     display: block;
+    margin-bottom: 8px;
 }
 
 .card-value {
-    font-size: 28px;
-    font-weight: bold;
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
     margin-top: 5px;
+    color: var(--text-primary);
 }
 
-.text-blue { color: #3498db; }
-.text-red { color: #e74c3c; }
+.text-blue {
+    color: #3498db;
+}
+
+.text-red {
+    color: var(--ifg-red);
+}
 
 /* Gráficos */
 .charts-grid {
@@ -147,6 +187,12 @@ header p {
     grid-template-columns: 1fr 2fr;
     gap: 20px;
     margin-bottom: 2rem;
+}
+
+.charts-grid h3 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    margin-bottom: 1rem;
 }
 
 .chart-area {
@@ -161,8 +207,9 @@ header p {
 
 /* Tabela de Atividade */
 .recent-activity h3 {
+    font-family: var(--font-heading);
     margin-bottom: 15px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 table {
@@ -172,16 +219,28 @@ table {
 }
 
 thead tr {
-    border-bottom: 2px solid #eee;
-    color: #888;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-secondary);
 }
 
-th, td {
-    padding: 12px 10px;
+th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+th,
+td {
+    padding: 16px 12px;
 }
 
 tbody tr {
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+}
+
+tbody tr:hover {
+    background-color: var(--bg-light);
 }
 
 .badge {
@@ -198,66 +257,114 @@ tbody tr {
 
 /* Fundo escuro transparente */
 .modal-overlay {
-    display: none; /* Começa escondido */
+    display: none;
+    /* Começa escondido */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Preto com 60% opacidade */
-    z-index: 1000; /* Garante que fique acima de tudo */
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Preto com 60% opacidade */
+    z-index: 1000;
+    /* Garante que fique acima de tudo */
     justify-content: center;
     align-items: center;
+    backdrop-filter: blur(2px);
 }
 
 /* A caixa branca do formulário */
 .modal-box {
-    background: white;
+    background: var(--white);
     padding: 30px;
     border-radius: 10px;
-    width: 400px;
+    width: 450px;
     max-width: 90%;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.3s ease;
+}
+
+.modal-box h2 {
+    font-family: var(--font-heading);
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
 }
 
 /* Botão de fechar (X) */
 .close-btn {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 15px;
+    right: 20px;
     font-size: 24px;
     cursor: pointer;
-    color: #666;
+    color: var(--text-secondary);
+    transition: color 0.2s;
 }
 
-.close-btn:hover { color: red; }
+.close-btn:hover {
+    color: var(--ifg-red);
+}
 
 /* Estilos simples do formulário */
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-.form-group input, .form-group select, .form-group textarea {
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: var(--font-body);
+    transition: border 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--ifg-green);
+    box-shadow: 0 0 0 2px rgba(48, 147, 60, 0.1);
 }
 
 .btn-salvar {
     width: 100%;
-    padding: 10px;
-    background-color: #00703C;
-    color: white;
+    padding: 12px;
+    background-color: var(--ifg-green);
+    color: var(--white);
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    transition: background 0.3s;
 }
-.btn-salvar:hover { background-color: #00502a; }
+
+.btn-salvar:hover {
+    background-color: var(--ifg-green-dark);
+}
 
 /* Animação suave */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

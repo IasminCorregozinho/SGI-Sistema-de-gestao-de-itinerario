@@ -6,6 +6,7 @@ export async function criar(req: Request, res: Response) {
         const resultado = await ativoService.cadastrarAtivo(req.body);
         return res.status(201).json(resultado);
     } catch (error: any) {
+        console.error('Erro ao criar ativo:', error);
         return res.status(500).json({ error: error.message });
     }
 }
@@ -16,6 +17,7 @@ export async function editar(req: Request, res: Response) {
         const resultado = await ativoService.atualizarAtivo(id, req.body);
         return res.status(200).json(resultado);
     } catch (error: any) {
+        console.error('Erro ao editar ativo:', error);
         if (error.message === 'Ativo não encontrado') {
             return res.status(404).json({ error: error.message });
         }
@@ -28,6 +30,7 @@ export async function listar(req: Request, res: Response) {
         const ativos = await ativoService.listarAtivos();
         return res.status(200).json(ativos);
     } catch (error: any) {
+        console.error('Erro ao listar ativo:', error);
         return res.status(500).json({ error: error.message });
     }
 }
@@ -35,9 +38,7 @@ export async function listar(req: Request, res: Response) {
 export async function getDashboardStats(req: Request, res: Response) {
     try {
         const dados = await ativoService.getDashboardData();
-
         res.status(200).json(dados);
-        
     } catch (error) {
         console.error('Erro no controller de dashboard:', error);
         res.status(500).json({ message: 'Erro ao buscar dados do dashboard' });

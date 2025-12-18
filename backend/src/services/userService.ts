@@ -90,7 +90,7 @@ export async function deleteProfile(id: number) {
   }
 }
 
-// Helper: Consulta de perfis
+// Auxiliar: Consulta de perfis
 export async function getProfiles() {
   const result = await pool.query("SELECT * FROM perfis");
   return result.rows;
