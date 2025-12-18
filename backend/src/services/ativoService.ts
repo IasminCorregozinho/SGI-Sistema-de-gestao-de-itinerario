@@ -44,10 +44,10 @@ export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
     return ativoAtualizado;
 }
 
-import * as AtivoRepository from '../repositories/ativoRepository';
+
 
 export async function getDashboardData() {
-    const stats = await AtivoRepository.getDashboardStats();
+    const stats = await ativoRepo.getDashboardStats();
 
     return {
         total: stats?.total || 0,
@@ -58,5 +58,5 @@ export async function getDashboardData() {
 }
 
 export async function getMovimentacoesRecentes() {
-    return await AtivoRepository.getUltimasMovimentacoes();
+    return await ativoRepo.getUltimasMovimentacoes();
 }
