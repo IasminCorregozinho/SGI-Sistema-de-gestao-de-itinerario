@@ -82,7 +82,7 @@ export async function createHistorico(hist: HistoricoAtivo): Promise<void> {
 // FUNÇÃO DO DASHBOARD 
 
 export async function getDashboardStats() {
-    
+
     const query = `
         SELECT 
             -- Conta todas as linhas da tabela (Total de Ativos)
@@ -102,10 +102,10 @@ export async function getDashboardStats() {
 
     try {
         const result = await pool.query(query);
-        return result.rows[0]; 
+        return result.rows[0];
     } catch (error) {
         console.error('Erro ao buscar estatísticas do dashboard:', error);
-        throw error; 
+        throw error;
     }
 }
 
@@ -117,7 +117,7 @@ export async function getUltimasMovimentacoes() {
             s.descricao as acao,       
             h.data_movimentacao as data
         FROM historico_ativo h
-        INNER JOIN ATIVO a ON h.ativo_id = a.ativo_id
+        INNER JOIN ATIVO a ON h.ativo_id = a.id
         INNER JOIN STATUS_ATIVO s ON h.status_novo = s.status_id
         ORDER BY h.data_movimentacao DESC
         LIMIT 5

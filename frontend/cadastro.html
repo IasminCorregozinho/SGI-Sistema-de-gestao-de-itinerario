@@ -1,102 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGI - Cadastro de Ativo</title>
-    
+    <title>SGI :: Cadastro de Ativo</title>
+
     <link rel="stylesheet" href="cadastro.css">
-    
+
 </head>
+
 <body>
 
-<div class="container">
-    <h2>Cadastrar Novo Ativo</h2>
-    
-    <form id="formCadastro">
-        <label>Nº Patrimônio:</label>
-        <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
+    <div class="container">
+        <h2>Cadastrar Novo Ativo</h2>
 
-        <label>Tipo de Ativo:</label>
-        <select id="tipo_ativo">
-            <option value="10">Computador</option>
-            <option value="11">Monitor</option>
-            <option value="12">Impressora</option>
-        </select>
+        <form id="formCadastro">
+            <label>Nº Patrimônio:</label>
+            <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
 
-        <label>Marca / Modelo:</label>
-        <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
+            <label>Tipo de Ativo:</label>
+            <select id="tipo_ativo">
+                <option value="10">Computador</option>
+                <option value="11">Monitor</option>
+                <option value="12">Impressora</option>
+            </select>
 
-        <label>Status:</label>
-        <select id="status">
-            <option value="13">Em uso</option>
-            <option value="14">Em manutenção</option>
-            <option value="15">Em estoque</option>
-        </select>
+            <label>Marca / Modelo:</label>
+            <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
 
-        <label>Localização:</label>
-        <select id="localizacao">
-            <option value="11">Recursos Humanos</option>
-            <option value="12">Financeiro</option>
-            <option value="15">Recepção Central</option>
-        </select>
+            <label>Status:</label>
+            <select id="status">
+                <option value="13">Em uso</option>
+                <option value="14">Em manutenção</option>
+                <option value="15">Em estoque</option>
+            </select>
 
-        <label>Responsável:</label>
-        <select id="responsavel">
-            <option value="1">Usuário Suporte</option>
-            <option value="4">Fabiana Chaves</option>
-        </select>
+            <label>Localização:</label>
+            <select id="localizacao">
+                <option value="11">Recursos Humanos</option>
+                <option value="12">Financeiro</option>
+                <option value="15">Recepção Central</option>
+            </select>
 
-        <label>Observações:</label>
-        <textarea id="obs" rows="3"></textarea>
+            <label>Responsável:</label>
+            <select id="responsavel">
+                <option value="1">Usuário Suporte</option>
+                <option value="4">Fabiana Chaves</option>
+            </select>
 
-        <button type="submit">Salvar Cadastro</button>
-    </form>
+            <label>Observações:</label>
+            <textarea id="obs" rows="3"></textarea>
 
-    <div id="mensagem" class="msg"></div>
-</div>
+            <button type="submit">Salvar Cadastro</button>
+        </form>
 
-<script>
-    const form = document.getElementById('formCadastro');
-    const msgDiv = document.getElementById('mensagem');
+        <div id="mensagem" class="msg"></div>
+    </div>
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
+    <script>
+        const form = document.getElementById('formCadastro');
+        const msgDiv = document.getElementById('mensagem');
 
-        const dados = {
-            patrimonio: document.getElementById('patrimonio').value,
-            id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
-            marca_modelo: document.getElementById('marca_modelo').value,
-            id_status: parseInt(document.getElementById('status').value),
-            id_localizacao: parseInt(document.getElementById('localizacao').value),
-            id_responsavel: parseInt(document.getElementById('responsavel').value),
-            obs: document.getElementById('obs').value
-        };
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        try {
-            const response = await fetch('/ativos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            });
+            const dados = {
+                patrimonio: document.getElementById('patrimonio').value,
+                id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+                marca_modelo: document.getElementById('marca_modelo').value,
+                id_status: parseInt(document.getElementById('status').value),
+                id_localizacao: parseInt(document.getElementById('localizacao').value),
+                id_responsavel: parseInt(document.getElementById('responsavel').value),
+                obs: document.getElementById('obs').value
+            };
 
-            const resultado = await response.json();
+            try {
+                const response = await fetch('/ativos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
 
-            if (response.ok) {
-                msgDiv.innerText = "Ativo cadastrado com sucesso!";
-                msgDiv.className = "msg sucesso";
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    msgDiv.innerText = "Ativo cadastrado com sucesso!";
+                    msgDiv.className = "msg sucesso";
+                    msgDiv.style.display = "block";
+                    form.reset();
+                } else {
+                    throw new Error(resultado.error || "Erro desconhecido");
+                }
+            } catch (erro) {
+                msgDiv.innerText = "Erro: " + erro.message;
+                msgDiv.className = "msg erro";
                 msgDiv.style.display = "block";
-                form.reset(); 
-            } else {
-                throw new Error(resultado.error || "Erro desconhecido");
             }
-        } catch (erro) {
-            msgDiv.innerText = "Erro: " + erro.message;
-            msgDiv.className = "msg erro";
-            msgDiv.style.display = "block";
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
+
 </html>

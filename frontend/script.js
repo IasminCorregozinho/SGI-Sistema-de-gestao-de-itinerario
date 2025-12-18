@@ -27,8 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert((data.message || ''));
+                alert((data.message || 'Login com sucesso!'));
                 console.log('Dados do usuário:', data);
+                // Redirecionar para o dashboard
+                window.location.href = 'dashboard.html';
             } else {
                 alert('Erro no login: ' + (data.error || 'Falha desconhecida'));
             }
