@@ -1,6 +1,5 @@
 /* dashboard.css */
 
-/* Global Reset & Typography */
 :root {
     --ifg-green: #30933C;
     --ifg-green-dark: #1f6b29;
@@ -27,7 +26,6 @@ body {
     color: var(--text-primary);
     height: 100vh;
     overflow: hidden;
-    /* Evita barra de rolagem dupla */
 }
 
 .dashboard-layout {
@@ -35,7 +33,6 @@ body {
     height: 100vh;
 }
 
-/* Sidebar */
 .sidebar {
     width: 250px;
     background-color: var(--ifg-green);
@@ -69,15 +66,12 @@ body {
     background-color: var(--ifg-green-dark);
 }
 
-/* Área de Conteúdo Principal */
 .content {
     flex: 1;
     padding: 2rem;
     overflow-y: auto;
-    /* Apenas o conteúdo rola, sidebar fixa */
 }
 
-/* Cabeçalho */
 header {
     display: flex;
     justify-content: space-between;
@@ -97,7 +91,6 @@ header p {
     font-size: 14px;
 }
 
-/* Barra de Ações (Botões e Busca) */
 .actions {
     display: flex;
     gap: 15px;
@@ -123,12 +116,10 @@ header p {
     font-weight: 600;
     text-decoration: none;
     display: inline-flex;
-    /* Better for centering with icons */
     justify-content: center;
     align-items: center;
     gap: 8px;
     min-width: 160px;
-    /* Enforce uniform size */
     text-align: center;
     transition: all var(--transition-speed);
     font-family: var(--font-heading);
@@ -140,7 +131,6 @@ header p {
     box-shadow: 0 4px 8px rgba(48, 147, 60, 0.2);
 }
 
-/* Cards de KPI (Números grandes) */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -339,7 +329,9 @@ tbody tr:hover {
 }
 
 .btn-salvar {
-    width: 100%;
+    width: 50%;
+    margin: 10px auto;
+    display: block;
     padding: 12px;
     background-color: var(--ifg-green);
     color: var(--white);
@@ -367,4 +359,44 @@ tbody tr:hover {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: var(--white);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+}
+
+.btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.modal-actions .btn-delete,
+.modal-actions .btn-cancel {
+    width: 120px;
+    justify-content: center;
 }
