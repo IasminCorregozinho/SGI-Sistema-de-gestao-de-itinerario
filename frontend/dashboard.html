@@ -80,7 +80,6 @@
             grid-column: span 2;
             padding: 12px;
             background-color: #30933C;
-            /* IFG Green */
             color: white;
             border: none;
             border-radius: 5px;
@@ -132,8 +131,9 @@
                 <a href="#" class="menu-item">
                     <i class="fa-solid fa-list"></i> Listagem
                 </a>
-                <a href="#" class="menu-item">
-                    <i class="fa-solid fa-gear"></i> Configurações
+                <a href="#" class="menu-item" id="menuGerenciarPerfis" onclick="abrirModalGerenciarPerfis()"
+                    style="display: none;">
+                    <i class="fa-solid fa-users-gear"></i> Gerenciar Perfis
                 </a>
                 <a href="#" class="menu-item" style="margin-top: auto;" onclick="logout()">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
@@ -286,6 +286,79 @@
         </div>
     </div>
 
+    <!-- MODAL GERENCIAR PERFIS -->
+    <div id="modalGerenciarPerfis" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="fecharModalGerenciarPerfis()">&times;</span>
+            <h2>Gerenciar Perfis</h2>
+
+            <div style="border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 20px;">
+                <h3>Novo Perfil</h3>
+                <form onsubmit="criarPerfil(event)" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="conf_nome" required placeholder="Nome do Responsável">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label>Matrícula</label>
+                            <input type="text" id="conf_matricula" required placeholder="Matrícula">
+                        </div>
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <input type="password" id="conf_senha" required placeholder="Senha">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Perfil</label>
+                        <select id="conf_perfil_id">
+                            <option value="1">Suporte (Padrão)</option>
+                            <option value="2">Coordenação</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-salvar">Cadastrar Usuário</button>
+                    <div id="msgConfig"
+                        style="margin-top: 10px; display: none; padding: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <h3>Usuários Cadastrados</h3>
+                <div id="msgLista"
+                    style="margin-bottom: 10px; display: none; padding: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
+                </div>
+                <div style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                    <table id="tabelaPerfis" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                                <th>Perfil</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO -->
+    <div id="modalConfirmacao" class="modal-overlay" style="z-index: 1001;">
+        <div class="modal-box" style="width: 350px; text-align: center;">
+            <h3>Confirmar Exclusão</h3>
+            <p style="margin: 20px 0; color: #64748b;">Tem certeza que deseja remover este perfil? Esta ação não pode
+                ser desfeita.</p>
+            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="fecharModalConfirmacao()" class="btn-cancel">Cancelar</button>
+                <button onclick="executarExclusao()" class="btn-delete">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 1. FUNÇÕES DO MODAL (NO TOPO)
         function abrirModal() {
@@ -304,13 +377,166 @@
 
         window.onclick = function (event) {
             const modal = document.getElementById('modalCadastro');
-            if (event.target == modal) {
-                fecharModal();
-            }
+            const modalGerenciar = document.getElementById('modalGerenciarPerfis');
+            const modalConfirm = document.getElementById('modalConfirmacao');
+
+            if (event.target == modal) fecharModal();
+            if (event.target == modalGerenciar) fecharModalGerenciarPerfis();
+            if (event.target == modalConfirm) fecharModalConfirmacao();
         }
 
         // 2. LÓGICA DO DASHBOARD
         const API_BASE = '/ativos';
+        const API_USERS = '/users';
+
+        // --- Lógica de Gerenciar Perfis ---
+        function abrirModalGerenciarPerfis() {
+            const modal = document.getElementById('modalGerenciarPerfis');
+            if (modal) {
+                modal.style.display = 'flex';
+                listarPerfis();
+            }
+        }
+
+        function fecharModalGerenciarPerfis() {
+            document.getElementById('modalGerenciarPerfis').style.display = 'none';
+        }
+
+        async function criarPerfil(e) {
+            e.preventDefault();
+            const nome = document.getElementById('conf_nome').value;
+            const matricula = document.getElementById('conf_matricula').value;
+            const senha = document.getElementById('conf_senha').value;
+            const perfil_id = document.getElementById('conf_perfil_id').value;
+
+            const msgDiv = document.getElementById('msgConfig');
+            msgDiv.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_USERS}/perfis`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, matricula, senha, perfil_id })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Sucesso
+                    msgDiv.innerText = 'Usuário criado com sucesso!';
+                    msgDiv.style.display = 'block';
+                    msgDiv.style.backgroundColor = '#d1fae5'; // Fundo verde claro
+                    msgDiv.style.color = '#065f46'; // Texto verde escuro
+                    msgDiv.style.border = '1px solid #a7f3d0';
+
+                    document.getElementById('conf_nome').value = '';
+                    document.getElementById('conf_matricula').value = '';
+                    document.getElementById('conf_senha').value = '';
+                    listarPerfis();
+
+                    // Esconder mensagem após 3 segundos
+                    setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+                } else {
+                    // Erro
+                    throw new Error(data.error || 'Falha ao criar');
+                }
+            } catch (error) {
+                // Erro
+                console.error(error);
+                msgDiv.innerText = error.message || 'Erro de conexão';
+                msgDiv.style.display = 'block';
+                msgDiv.style.backgroundColor = '#fee2e2'; // Fundo vermelho claro
+                msgDiv.style.color = '#991b1b'; // Texto vermelho escuro
+                msgDiv.style.border = '1px solid #fecaca';
+            }
+        }
+
+        async function removeProfile(id) {
+            idParaExcluir = id;
+            const modal = document.getElementById('modalConfirmacao');
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalConfirmacao() {
+            document.getElementById('modalConfirmacao').style.display = 'none';
+            idParaExcluir = null;
+        }
+
+        async function executarExclusao() {
+            if (!idParaExcluir) return;
+
+            const id = idParaExcluir; // Salvar ID localmente
+            const msgDiv = document.getElementById('msgLista');
+            msgDiv.style.display = 'none';
+
+            // Fechar modal de confirmação antes de prosseguir
+            fecharModalConfirmacao();
+
+            try {
+                const res = await fetch(`${API_USERS}/perfis/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    msgDiv.innerText = 'Perfil removido!';
+                    msgDiv.style.display = 'block';
+                    msgDiv.style.backgroundColor = '#d1fae5';
+                    msgDiv.style.color = '#065f46';
+                    msgDiv.style.border = '1px solid #a7f3d0';
+
+                    listarPerfis();
+                    setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+                } else {
+                    throw new Error('Erro ao remover');
+                }
+            } catch (error) {
+                msgDiv.innerText = 'Erro ao remover';
+                msgDiv.style.display = 'block';
+                msgDiv.style.backgroundColor = '#fee2e2';
+                msgDiv.style.color = '#991b1b';
+                msgDiv.style.border = '1px solid #fecaca';
+            }
+        }
+
+        async function listarPerfis() {
+            try {
+                const res = await fetch(`${API_USERS}/perfis`);
+                if (res.ok) {
+                    const perfis = await res.json();
+                    const tbody = document.querySelector('#tabelaPerfis tbody');
+                    tbody.innerHTML = '';
+                    perfis.forEach(p => {
+                        const tipoPerfil = p.perfil_id === 2 ? 'Coordenação' : 'Suporte';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${p.responsavel_id}</td>
+                                <td>${p.nome}</td>
+                                <td>${p.matricula}</td>
+                                <td>${tipoPerfil}</td>
+                                <td>
+                                    <button onclick="removeProfile(${p.responsavel_id})" class="btn-delete">
+                                        Excluir
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function verificarAcessoGerenciarPerfis() {
+            const userStr = localStorage.getItem('usuario');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                // ID 2 é Coordenação
+                if (user.perfil_id === 2) {
+                    document.getElementById('menuGerenciarPerfis').style.display = 'block';
+                } else {
+                    document.getElementById('menuGerenciarPerfis').style.display = 'none';
+                }
+            } else {
+                document.getElementById('menuGerenciarPerfis').style.display = 'none';
+            }
+        }
 
         async function carregarDashboard() {
             try {
@@ -442,7 +668,10 @@
             window.location.href = 'index.html';
         }
 
-        document.addEventListener('DOMContentLoaded', carregarDashboard);
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDashboard();
+            verificarAcessoGerenciarPerfis();
+        });
     </script>
 </body>
 

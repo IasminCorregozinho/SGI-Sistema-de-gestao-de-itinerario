@@ -22,11 +22,11 @@ export async function login(req: Request, res: Response) {
 
 export async function createProfile(req: Request, res: Response) {
   try {
-    const { nome, matricula, senha } = req.body;
+    const { nome, matricula, senha, perfil_id } = req.body;
     if (!matricula || !nome || !senha) {
       return res.status(400).json({ error: "Matrícula, nome e senha são obrigatórios para criar um perfil" });
     }
-    const profile = await userService.createProfile(nome, matricula, senha);
+    const profile = await userService.createProfile(nome, matricula, senha, perfil_id);
     return res.status(201).json({ message: "Perfil criado com sucesso", profile });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
