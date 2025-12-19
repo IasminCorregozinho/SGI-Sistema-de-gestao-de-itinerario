@@ -14,84 +14,41 @@ export async function loginUser(matricula: string, senha: string) {
   return user;
 }
 
-// RF002: Inclusão de perfis
-export async function createProfile(nome: string, matricula: string, senha: string) {
+// RF002: Inclusão de perfis (Criação de novos usuários com perfil definido)
+export async function createProfile(nome: string, matricula: string, senha: string, perfil_id: number = 1) {
+  // Por padrão, cria com perfil 1 (Suporte) se não especificado
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
-
-    // 1. Verificar se o usuário existe
-    const userCheck = await client.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
-    let userId;
-
-    if (userCheck.rows.length === 0) {
-      // 2. Criar usuário com perfil_id NULL
-      const newUser = await client.query(
-        "INSERT INTO responsavel (nome, matricula, senha, perfil_id) VALUES ($1, $2, $3, NULL) RETURNING responsavel_id",
-        [nome, matricula, senha]
-      );
-      userId = newUser.rows[0].responsavel_id;
-    } else {
-      userId = userCheck.rows[0].responsavel_id;
+    const existingUser = await client.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
+    if (existingUser.rows.length > 0) {
+      throw new Error("Matrícula já cadastrada para outro usuário.");
     }
 
-    // 3. Criar perfil
-    const newProfile = await client.query(
-      "INSERT INTO perfis (matricula) VALUES ($1) RETURNING *",
-      [matricula]
-    );
-    const profileId = newProfile.rows[0].perfil_id;
-
-    // 4. Atualizar usuário com novo perfil_id
-    await client.query(
-      "UPDATE responsavel SET perfil_id = $1 WHERE responsavel_id = $2",
-      [profileId, userId]
-    );
-
-    await client.query('COMMIT');
-    return newProfile.rows[0];
-  } catch (e) {
-    await client.query('ROLLBACK');
-    throw e;
-  } finally {
-    client.release();
-  }
-}
-
-// RF002: Exclusão de perfis
-export async function deleteProfile(id: number) {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-
-    // 1. Desvincular usuários que referenciam este perfil
-    await client.query(
-      "UPDATE responsavel SET perfil_id = NULL WHERE perfil_id = $1",
-      [id]
-    );
-
-    // 2. Excluir o perfil
     const result = await client.query(
-      "DELETE FROM perfis WHERE perfil_id = $1 RETURNING *",
-      [id]
+      "INSERT INTO responsavel (nome, matricula, senha, perfil_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [nome, matricula, senha, perfil_id]
     );
-
-    if (result.rowCount === 0) {
-      throw new Error("Perfil não encontrado");
-    }
-
-    await client.query('COMMIT');
     return result.rows[0];
-  } catch (e) {
-    await client.query('ROLLBACK');
-    throw e;
   } finally {
     client.release();
   }
 }
 
-// Auxiliar: Consulta de perfis
+// RF002: Exclusão de perfis (Exclusão de usuários)
+export async function deleteProfile(id: number) {
+  const result = await pool.query(
+    "DELETE FROM responsavel WHERE responsavel_id = $1 RETURNING *",
+    [id]
+  );
+
+  if (result.rowCount === 0) {
+    throw new Error("Usuário não encontrado");
+  }
+  return result.rows[0];
+}
+
+// Auxiliar: Consulta de perfis (Listagem de usuários cadastrados)
 export async function getProfiles() {
-  const result = await pool.query("SELECT * FROM perfis");
+  const result = await pool.query("SELECT * FROM responsavel ORDER BY responsavel_id ASC");
   return result.rows;
 }

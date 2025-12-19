@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 // SUCESSO: Redireciona para o Dashboard
                 console.log('Login com sucesso, redirecionando...');
+                // Salvar dados do usuário para controle de acesso (Sessão simples)
+                localStorage.setItem('usuario', JSON.stringify(data.user));
                 window.location.href = 'dashboard.html';
             } else {
                 // ERRO: Mostrar mensagem no container
