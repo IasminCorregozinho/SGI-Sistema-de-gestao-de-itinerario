@@ -14,7 +14,6 @@ export async function loginUser(matricula: string, senha: string) {
   return user;
 }
 
-// RF002: Inclusão de perfis
 // RF002: Inclusão de perfis (Criação de novos usuários com perfil definido)
 export async function createProfile(nome: string, matricula: string, senha: string, perfil_id: number = 1) {
   // Por padrão, cria com perfil 1 (Suporte) se não especificado
