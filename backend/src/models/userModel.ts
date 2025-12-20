@@ -9,13 +9,13 @@ export interface User {
 }
 
 
-export async function findUserByMatricula(matricula: string) {
+export async function buscarUsuarioPorMatricula(matricula: string) {
   const result = await pool.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
   return result.rows[0];
 }
 
 
-export async function createUser(user: User) {
+export async function criarUsuario(user: User) {
   const { name, matricula, senha, perfil_id } = user;
   const result = await pool.query(
     "INSERT INTO responsavel (nome, matricula, senha, perfil_id) VALUES ($1, $2, $3, $4) RETURNING *",

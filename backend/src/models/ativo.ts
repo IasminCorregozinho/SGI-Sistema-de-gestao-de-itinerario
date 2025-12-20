@@ -9,6 +9,12 @@ export interface Ativo {
     data_aquisicao?: Date;
     info_tecnicas?: string;
     obs?: string;
+
+    // Campos virtuais (joins)
+    tipo_ativo_nome?: string;
+    status_nome?: string;
+    localizacao_nome?: string;
+    responsavel_nome?: string;
 }
 
 // interface para o Histórico

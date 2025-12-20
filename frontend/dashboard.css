@@ -1,5 +1,3 @@
-/* dashboard.css */
-
 :root {
     --ifg-green: #30933C;
     --ifg-green-dark: #1f6b29;
@@ -67,9 +65,22 @@ body {
 }
 
 .content {
+
     flex: 1;
     padding: 2rem;
     overflow-y: auto;
+    position: relative;
+}
+
+.content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--ifg-green), var(--ifg-red));
+    z-index: 10;
 }
 
 header {
@@ -109,7 +120,11 @@ header p {
 .btn-primary {
     background-color: var(--ifg-green);
     color: var(--white);
-    padding: 10px 20px;
+    color: var(--white);
+    padding: 0 20px;
+    height: 44px;
+    font-size: 1rem;
+    line-height: 44px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
@@ -208,6 +223,17 @@ table {
     border-collapse: collapse;
 }
 
+#tabelaAtivos {
+    table-layout: fixed;
+}
+
+#tabelaAtivos th,
+#tabelaAtivos td {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
 thead tr {
     border-bottom: 2px solid var(--border-color);
     color: var(--text-secondary);
@@ -268,11 +294,38 @@ tbody tr:hover {
     background: var(--white);
     padding: 30px;
     border-radius: 10px;
-    width: 450px;
+    width: 700px;
     max-width: 90%;
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.3s ease;
+}
+
+#formAtivo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+    .modal-box {
+        width: 95%;
+        padding: 20px;
+    }
+
+    #formAtivo {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .span-2 {
+        grid-column: span 1;
+    }
 }
 
 .modal-box h2 {
@@ -330,6 +383,7 @@ tbody tr:hover {
 
 .btn-salvar {
     width: 50%;
+    grid-column: span 2;
     margin: 10px auto;
     display: block;
     padding: 12px;
