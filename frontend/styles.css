@@ -24,7 +24,8 @@ body {
     background-color: var(--bg-light);
     color: var(--text-primary);
     height: 100vh;
-    overflow: hidden; /* Prevent scroll on full screen split */
+    overflow: hidden;
+    /* Prevent scroll on full screen split */
 }
 
 .main-container {
@@ -52,8 +53,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at top left, rgba(255,255,255,0.1), transparent),
-                linear-gradient(135deg, rgba(0,0,0,0.2), transparent);
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent),
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), transparent);
     z-index: 1;
 }
 
@@ -74,11 +75,11 @@ body {
 .brand-content {
     position: relative;
     z-index: 2;
-    max-width: 900px; 
-    
+    max-width: 900px;
+
     display: flex;
-    flex-direction: row; 
-    align-items: flex-start; 
+    flex-direction: row;
+    align-items: flex-start;
     gap: 2rem;
     text-align: left;
 }
@@ -89,10 +90,10 @@ body {
 
 .logo-placeholder {
     width: 100%;
-    max-width: 200px; 
+    max-width: 200px;
     height: auto;
     margin-bottom: 1rem;
-    
+
     background: transparent;
     border: none;
     display: block;
@@ -101,15 +102,15 @@ body {
 .logo-placeholder img {
     width: 100%;
     height: auto;
-    display: block; 
+    display: block;
     object-fit: contain;
 }
 
 .logo-placeholder img {
     width: 100%;
     height: auto;
-    border-radius: 8px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-text h1 {
@@ -118,7 +119,7 @@ body {
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-text .system-name {
@@ -207,14 +208,15 @@ body {
 
 .input-wrapper input {
     width: 100%;
-    padding: 0.9rem 1rem 0.9rem 2.8rem; /* Space for icon */
+    padding: 0.9rem 1rem 0.9rem 2.8rem;
+    /* Space for icon */
     font-size: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background-color: var(--bg-light);
     transition: all var(--transition-speed);
     font-family: var(--font-body);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .input-wrapper input:focus {
@@ -271,7 +273,8 @@ body {
     font-size: 0.9rem;
     font-family: var(--font-body);
     font-weight: 500;
-    display: none; /* Initially hidden */
+    display: none;
+    /* Initially hidden */
 }
 
 .card-footer {
@@ -292,18 +295,18 @@ body {
         flex-direction: column;
         overflow-y: auto;
     }
-    
+
     .left-pane {
         padding: 3rem 2rem;
         flex: 0 0 auto;
         min-height: 40vh;
     }
-    
+
     .right-pane {
         padding: 2rem;
         flex: 1 0 auto;
     }
-    
+
     .welcome-text h1 {
         font-size: 2.5rem;
     }

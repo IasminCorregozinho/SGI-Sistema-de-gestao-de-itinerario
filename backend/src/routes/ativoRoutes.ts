@@ -10,8 +10,8 @@ const ALLOWED_PROFILES = [1, 2];
 router.post('/', ativoController.criar);
 router.put('/:id', ativoController.editar);
 router.get('/', ativoController.listar);
-router.get('/dashboard-kpis', ativoController.getDashboardStats);
-router.get('/movimentacoes-recentes', ativoController.getMovimentacoes);
+router.get('/dashboard-kpis', ativoController.obterDadosDashboard);
+router.get('/movimentacoes-recentes', ativoController.obterMovimentacoes);
 
 export default router;
 
