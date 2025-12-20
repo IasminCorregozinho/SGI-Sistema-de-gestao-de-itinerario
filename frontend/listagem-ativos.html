@@ -5,14 +5,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGI :: Listagem de Ativos</title>
-    <link rel="stylesheet" href="dashboard.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        :root {
+            --ifg-green: #30933C;
+            --ifg-green-dark: #1f6b29;
+            --ifg-red: #EA3636;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-body);
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--ifg-green);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .menu-item {
+            padding: 15px;
+            color: var(--white);
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background var(--transition-speed);
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background-color: var(--ifg-green-dark);
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Decoração Degradê Superior */
+        .content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--ifg-green), var(--ifg-red));
+            z-index: 10;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: var(--ifg-green);
+            color: var(--white);
+            padding: 0 20px;
+            height: 44px;
+            font-size: 1rem;
+            line-height: 44px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            min-width: 160px;
+            text-align: center;
+            transition: all var(--transition-speed);
+            font-family: var(--font-heading);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--ifg-green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(48, 147, 60, 0.2);
+        }
+
+        /* --- Estilos Específicos da Listagem de Ativos (da tag <style> original) --- */
         .filter-section {
             background: white;
             padding: 20px;
@@ -28,6 +167,37 @@
             gap: 15px;
         }
 
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--ifg-green);
+            box-shadow: 0 0 0 2px rgba(48, 147, 60, 0.1);
+        }
+
         .table-container {
             background: white;
             padding: 20px;
@@ -37,6 +207,68 @@
             overflow-x: auto;
         }
 
+        table {
+            width: 100%;
+            text-align: left;
+            border-collapse: collapse;
+        }
+
+        #tabelaAtivos {
+            table-layout: fixed;
+        }
+
+        #tabelaAtivos th,
+        #tabelaAtivos td {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            vertical-align: middle;
+            padding: 16px 12px;
+        }
+
+        thead tr {
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        /* Badges de Status */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-info {
+            background: #e0f7fa;
+            color: #006064;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Paginação */
         .pagination {
             display: flex;
             justify-content: flex-end;
@@ -74,6 +306,112 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Modal Styles (para Cadastro) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-box {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            width: 700px;
+            max-width: 90%;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #formAtivo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .modal-box {
+                width: 95%;
+                padding: 20px;
+            }
+
+            #formAtivo {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .span-2 {
+                grid-column: span 1;
+            }
+        }
+
+        .modal-box h2 {
+            font-family: var(--font-heading);
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--ifg-red);
+        }
+
+        .btn-salvar {
+            width: 50%;
+            grid-column: span 2;
+            margin: 10px auto;
+            display: block;
+            padding: 12px;
+            background-color: var(--ifg-green);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: var(--font-heading);
+            transition: background 0.3s;
+        }
+
+        .btn-salvar:hover {
+            background-color: var(--ifg-green-dark);
+        }
     </style>
 </head>
 
@@ -91,17 +429,14 @@
                 <a href="dashboard.html" class="menu-item">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
                 </a>
-                <a href="#" onclick="abrirModal()" class="menu-item">
+                <a href="#" id="menuCadastrarAtivo" class="menu-item">
                     <i class="fa-solid fa-plus"></i> Cadastrar Ativo
                 </a>
                 <a href="listagem-ativos.html" class="menu-item" style="background-color: var(--ifg-green-dark);">
                     <i class="fa-solid fa-list"></i> Listagem de Ativos
                 </a>
-                <a href="#" class="menu-item" id="menuGerenciarPerfis" onclick="abrirModalGerenciarPerfis()"
-                    style="display: none;">
-                    <i class="fa-solid fa-users-gear"></i> Gerenciar Perfis
-                </a>
-                <a href="#" class="menu-item" style="margin-top: auto;" onclick="logout()">
+
+                <a href="#" class="menu-item" style="margin-top: auto;" id="btnSair">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
                 </a>
             </nav>
@@ -133,11 +468,11 @@
                 <div class="filter-grid">
                     <div class="form-group">
                         <label>Patrimônio</label>
-                        <input type="text" id="filtro_patrimonio" onkeyup="aplicarFiltros()">
+                        <input type="text" id="filtro_patrimonio" placeholder="Buscar...">
                     </div>
                     <div class="form-group">
                         <label>Status</label>
-                        <select id="filtro_status" onchange="aplicarFiltros()">
+                        <select id="filtro_status">
                             <option value="">Todos</option>
                             <option value="13">Em uso</option>
                             <option value="14">Em manutenção</option>
@@ -146,7 +481,7 @@
                     </div>
                     <div class="form-group">
                         <label>Localização</label>
-                        <select id="filtro_localizacao" onchange="aplicarFiltros()">
+                        <select id="filtro_localizacao">
                             <option value="">Todas</option>
                             <option value="11">Recursos Humanos</option>
                             <option value="12">Financeiro</option>
@@ -155,7 +490,7 @@
                     </div>
                     <div class="form-group">
                         <label>Responsável</label>
-                        <select id="filtro_responsavel" onchange="aplicarFiltros()">
+                        <select id="filtro_responsavel">
                             <option value="">Todos</option>
                             <option value="1">Usuário Suporte</option>
                             <option value="4">Fabiana Chaves</option>
@@ -163,11 +498,11 @@
                     </div>
                     <div class="form-group">
                         <label>Marca/Modelo</label>
-                        <input type="text" id="filtro_marca" onkeyup="aplicarFiltros()">
+                        <input type="text" id="filtro_marca" placeholder="Buscar...">
                     </div>
                     <div class="form-group">
                         <label>Observação</label>
-                        <input type="text" id="filtro_obs" onkeyup="aplicarFiltros()">
+                        <input type="text" id="filtro_obs" placeholder="Buscar...">
                     </div>
                 </div>
             </section>
@@ -196,23 +531,24 @@
             <!-- Paginação -->
             <div class="pagination">
                 <span id="infoPaginacao">Página 1 de 1</span>
-                <button onclick="paginaAnterior()" id="btnAnterior" disabled>Anterior</button>
-                <button onclick="proximaPagina()" id="btnProximo" disabled>Próxima</button>
+                <button id="btnAnterior" disabled>Anterior</button>
+                <button id="btnProximo" disabled>Próxima</button>
             </div>
 
         </main>
     </div>
 
+    <!-- MODAL CADASTRO -->
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-box">
-            <span class="close-btn" onclick="fecharModal()">&times;</span>
+            <span class="close-btn" id="fecharModal">&times;</span>
             <h2>Cadastrar Novo Ativo</h2>
 
             <div id="msgCadastro"
                 style="display: none; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
             </div>
 
-            <form id="formAtivo" onsubmit="salvarAtivo(event)">
+            <form id="formAtivo">
                 <div class="form-group">
                     <label>Nº Patrimônio</label>
                     <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
@@ -269,252 +605,277 @@
     </div>
 
     <script>
-        // Variáveis para controlar os dados e paginação
-        let todosAtivos = [];
-        let ativosFiltrados = [];
-        let paginaAtual = 1;
-        const itensPorPagina = 50;
-
-        const API_BASE = '/ativos';
-
-        // Função executada quando a tela carrega
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicialização de Estado
+            let todosAtivos = [];
+            let ativosFiltrados = [];
+            let paginaAtual = 1;
+            const itensPorPagina = 50;
+            const API_BASE = '/ativos';
+            const modalCadastro = document.getElementById('modalCadastro');
+
+            // --- Event Listeners ---
+
+            // Navegação e Modal
+            document.getElementById('menuCadastrarAtivo').addEventListener('click', abrirModal);
+            document.getElementById('fecharModal').addEventListener('click', fecharModal);
+            document.getElementById('btnSair').addEventListener('click', logout);
+
+            // Filtros - Eventos
+            document.getElementById('filtro_patrimonio').addEventListener('keyup', aplicarFiltros);
+            document.getElementById('filtro_status').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtro_localizacao').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtro_responsavel').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtro_marca').addEventListener('keyup', aplicarFiltros);
+            document.getElementById('filtro_obs').addEventListener('keyup', aplicarFiltros);
+
+            // Paginação
+            document.getElementById('btnAnterior').addEventListener('click', paginaAnterior);
+            document.getElementById('btnProximo').addEventListener('click', proximaPagina);
+
+            // Formulário
+            document.getElementById('formAtivo').addEventListener('submit', salvarAtivo);
+
+            // Fechar modal clicando fora
+            window.onclick = function (event) {
+                if (event.target == modalCadastro) fecharModal();
+            }
+
+            // Inicialização
             carregarAtivos();
             verificarLogin();
-        });
 
-        function verificarLogin() {
-            const userStr = localStorage.getItem('usuario');
-            if (!userStr) {
+            // --- Funções Auxiliares ---
+
+            function verificarLogin() {
+                const userStr = localStorage.getItem('usuario');
+                if (!userStr) {
+                    window.location.href = 'index.html';
+                }
+            }
+
+            function logout() {
+                localStorage.removeItem('usuario');
                 window.location.href = 'index.html';
             }
-        }
 
-        function logout() {
-            localStorage.removeItem('usuario');
-            window.location.href = 'index.html';
-        }
-
-        // Funções do Modal (iguais ao Dashboard)
-        function abrirModal() {
-            document.getElementById('modalCadastro').style.display = 'flex';
-        }
-        function fecharModal() {
-            document.getElementById('modalCadastro').style.display = 'none';
-        }
-
-        // Busca os dados do backend
-        async function carregarAtivos() {
-            const divMsg = document.getElementById('divMensagemSistema');
-            divMsg.style.display = 'none';
-
-            try {
-                // Fetch simples
-                const resposta = await fetch(API_BASE);
-                if (resposta.ok) {
-                    todosAtivos = await resposta.json();
-                    ativosFiltrados = todosAtivos;
-                    atualizarTabela();
-                } else {
-                    mostrarMensagem('divMensagemSistema', "Erro ao buscar ativos.", true);
-                }
-            } catch (erro) {
-                console.error(erro);
-                mostrarMensagem('divMensagemSistema', "Erro de conexão.", true);
-            }
-        }
-
-        function mostrarMensagem(elementId, texto, isErro = false) {
-            const divMsg = document.getElementById(elementId);
-            if (!divMsg) return;
-
-            divMsg.innerText = texto;
-            divMsg.style.display = 'block';
-
-            if (isErro) {
-                divMsg.style.backgroundColor = '#fee2e2';
-                divMsg.style.color = '#991b1b';
-                divMsg.style.border = '1px solid #fecaca';
-            } else {
-                divMsg.style.backgroundColor = '#d1fae5';
-                divMsg.style.color = '#065f46';
-                divMsg.style.border = '1px solid #a7f3d0';
+            function abrirModal(e) {
+                if (e) e.preventDefault();
+                document.getElementById('modalCadastro').style.display = 'flex';
             }
 
-            // Ocultar após 5 segundos
-            setTimeout(() => {
+            function fecharModal() {
+                document.getElementById('modalCadastro').style.display = 'none';
+            }
+
+            // Busca os dados do backend
+            async function carregarAtivos() {
+                const divMsg = document.getElementById('divMensagemSistema');
                 divMsg.style.display = 'none';
-            }, 5000);
-        }
 
-        async function salvarAtivo(event) {
-            event.preventDefault();
+                try {
+                    const resposta = await fetch(API_BASE);
+                    if (resposta.ok) {
+                        todosAtivos = await resposta.json();
+                        ativosFiltrados = todosAtivos;
+                        atualizarTabela();
+                    } else {
+                        mostrarMensagem('divMensagemSistema', "Erro ao buscar ativos.", true);
+                    }
+                } catch (erro) {
+                    console.error(erro);
+                    mostrarMensagem('divMensagemSistema', "Erro de conexão.", true);
+                }
+            }
 
-            const dadosAtivo = {
-                patrimonio: document.getElementById('patrimonio').value,
-                id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
-                marca_modelo: document.getElementById('marca_modelo').value,
-                id_status: parseInt(document.getElementById('status').value),
-                id_localizacao: parseInt(document.getElementById('localizacao').value),
-                id_responsavel: parseInt(document.getElementById('responsavel').value),
-                obs: document.getElementById('observacoes').value
-            };
+            function mostrarMensagem(elementId, texto, isErro = false) {
+                const divMsg = document.getElementById(elementId);
+                if (!divMsg) return;
 
-            // Limpa mensagem do modal antes de tentar
-            document.getElementById('msgCadastro').style.display = 'none';
+                divMsg.innerText = texto;
+                divMsg.style.display = 'block';
 
-            try {
-                const response = await fetch(API_BASE, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(dadosAtivo)
+                if (isErro) {
+                    divMsg.style.backgroundColor = '#fee2e2';
+                    divMsg.style.color = '#991b1b';
+                    divMsg.style.border = '1px solid #fecaca';
+                } else {
+                    divMsg.style.backgroundColor = '#d1fae5';
+                    divMsg.style.color = '#065f46';
+                    divMsg.style.border = '1px solid #a7f3d0';
+                }
+
+                // Ocultar após 5 segundos
+                setTimeout(() => {
+                    divMsg.style.display = 'none';
+                }, 5000);
+            }
+
+            async function salvarAtivo(event) {
+                event.preventDefault();
+
+                const dadosAtivo = {
+                    patrimonio: document.getElementById('patrimonio').value,
+                    id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+                    marca_modelo: document.getElementById('marca_modelo').value,
+                    id_status: parseInt(document.getElementById('status').value),
+                    id_localizacao: parseInt(document.getElementById('localizacao').value),
+                    id_responsavel: parseInt(document.getElementById('responsavel').value),
+                    obs: document.getElementById('observacoes').value
+                };
+
+                // Limpa mensagem do modal antes de tentar
+                document.getElementById('msgCadastro').style.display = 'none';
+
+                try {
+                    const response = await fetch(API_BASE, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dadosAtivo)
+                    });
+
+                    if (response.ok) {
+                        fecharModal();
+                        document.getElementById('formAtivo').reset();
+                        carregarAtivos();
+
+                        // Mostra sucesso na tela de listagem
+                        mostrarMensagem('divMensagemSistema', 'Ativo cadastrado com sucesso!', false);
+                    } else {
+                        // Mostra erro no modal
+                        mostrarMensagem('msgCadastro', 'Erro ao salvar.', true);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    // Mostra erro no modal
+                    mostrarMensagem('msgCadastro', 'Erro de conexão.', true);
+                }
+            }
+
+            function aplicarFiltros() {
+                // Pega os valores dos inputs
+                const fPatrimonio = document.getElementById('filtro_patrimonio').value.toLowerCase();
+                const fStatus = document.getElementById('filtro_status').value;
+                const fLocal = document.getElementById('filtro_localizacao').value;
+                const fResp = document.getElementById('filtro_responsavel').value;
+                const fMarca = document.getElementById('filtro_marca').value.toLowerCase();
+                const fObs = document.getElementById('filtro_obs').value.toLowerCase();
+
+                // Filtra o array principal
+                ativosFiltrados = todosAtivos.filter(ativo => {
+                    const conferePat = (ativo.patrimonio || "").toLowerCase().includes(fPatrimonio);
+                    const confereStatus = fStatus === "" || ativo.id_status == fStatus;
+                    const confereLocal = fLocal === "" || ativo.id_localizacao == fLocal;
+                    const confereResp = fResp === "" || ativo.id_responsavel == fResp;
+                    const confereMarca = (ativo.marca_modelo || "").toLowerCase().includes(fMarca);
+                    const confereObs = (ativo.obs || "").toLowerCase().includes(fObs);
+
+                    return conferePat && confereStatus && confereLocal && confereResp && confereMarca && confereObs;
                 });
 
-                if (response.ok) {
-                    fecharModal();
-                    document.getElementById('formAtivo').reset();
-                    carregarAtivos();
+                // Volta para página 1 sempre que filtra
+                paginaAtual = 1;
+                atualizarTabela();
+            }
 
-                    // Mostra sucesso na tela de listagem
-                    mostrarMensagem('divMensagemSistema', 'Ativo cadastrado com sucesso!', false);
+            function atualizarTabela() {
+                const tbody = document.querySelector('#tabelaAtivos tbody');
+                tbody.innerHTML = ""; // Limpa tabela
+
+                // Lógica de paginação manual
+                const inicio = (paginaAtual - 1) * itensPorPagina;
+                const fim = inicio + itensPorPagina;
+
+                // Pega só o pedaço do array necessário
+                const dadosPagina = ativosFiltrados.slice(inicio, fim);
+
+                if (dadosPagina.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='8' style='text-align:center'>Nenhum ativo encontrado.</td></tr>";
                 } else {
-                    // Mostra erro no modal
-                    mostrarMensagem('msgCadastro', 'Erro ao salvar.', true);
+                    for (let i = 0; i < dadosPagina.length; i++) {
+                        const ativo = dadosPagina[i];
+
+                        const statusTexto = ativo.status_nome || '-';
+                        const tipoTexto = ativo.tipo_ativo_nome || '-';
+                        const localTexto = ativo.localizacao_nome || '-';
+                        const respTexto = ativo.responsavel_nome || '-';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                                <td>${ativo.patrimonio}</td>
+                                <td>${tipoTexto}</td>
+                                <td>${ativo.marca_modelo || '-'}</td>
+                                <td>
+                                    <span class="badge ${obterClasseStatus(ativo.id_status)}">
+                                        ${statusTexto}
+                                    </span>
+                                </td>
+                                <td>${localTexto}</td>
+                                <td>${respTexto}</td>
+                                <td>${ativo.obs || "-"}</td>
+                                <td>
+                                    <div style="display: flex; gap: 15px;">
+                                        <button class="btn-icon btn-editar" title="Editar" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #30933C;">
+                                            <i class="fa-solid fa-pen-to-square" style="font-size: 1.4rem;"></i>
+                                        </button>
+                                        <button class="btn-icon btn-historico" title="Histórico" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #333;">
+                                            <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.4rem;"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+
+                    // Adicionar listeners para os botões dinâmicos
+                    document.querySelectorAll('.btn-editar').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            alert('Editar: ' + this.getAttribute('data-patrimonio'));
+                        });
+                    });
+                    document.querySelectorAll('.btn-historico').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            alert('Histórico: ' + this.getAttribute('data-patrimonio'));
+                        });
+                    });
                 }
-            } catch (error) {
-                console.error('Erro:', error);
-                // Mostra erro no modal
-                mostrarMensagem('msgCadastro', 'Erro de conexão.', true);
+
+                atualizarBotoesPaginacao();
             }
-        }
 
-        function aplicarFiltros() {
-            // Pega os valores dos inputs
-            const fPatrimonio = document.getElementById('filtro_patrimonio').value.toLowerCase();
-            const fStatus = document.getElementById('filtro_status').value;
-            const fLocal = document.getElementById('filtro_localizacao').value;
-            const fResp = document.getElementById('filtro_responsavel').value;
-            const fMarca = document.getElementById('filtro_marca').value.toLowerCase();
-            const fObs = document.getElementById('filtro_obs').value.toLowerCase();
+            function obterClasseStatus(id) {
+                if (id == 13) return 'badge-info';
+                if (id == 14) return 'badge-warning';
+                if (id == 15) return 'badge-success';
+                return '';
+            }
 
-            // Filtra o array principal
-            ativosFiltrados = todosAtivos.filter(ativo => {
-                // Checa patrimônio
-                const conferePat = (ativo.patrimonio || "").toLowerCase().includes(fPatrimonio);
+            function atualizarBotoesPaginacao() {
+                const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
 
-                // Checa status (se filtro vazio, aceita todos)
-                const confereStatus = fStatus === "" || ativo.id_status == fStatus;
+                document.getElementById('infoPaginacao').innerText = `Página ${paginaAtual} de ${totalPaginas || 1}`;
 
-                // Checa localização
-                const confereLocal = fLocal === "" || ativo.id_localizacao == fLocal;
+                document.getElementById('btnAnterior').disabled = (paginaAtual === 1);
+                document.getElementById('btnProximo').disabled = (paginaAtual >= totalPaginas || totalPaginas === 0);
+            }
 
-                // Checa responsável
-                const confereResp = fResp === "" || ativo.id_responsavel == fResp;
-
-                // Checa marca
-                const confereMarca = (ativo.marca_modelo || "").toLowerCase().includes(fMarca);
-
-                // Checa obs
-                const confereObs = (ativo.obs || "").toLowerCase().includes(fObs);
-
-                // Só retorna true se TODOS conferem
-                return conferePat && confereStatus && confereLocal && confereResp && confereMarca && confereObs;
-            });
-
-            // Volta para página 1 sempre que filtra
-            paginaAtual = 1;
-            atualizarTabela();
-        }
-
-        // Função que desenha a tabela
-        function atualizarTabela() {
-            const tbody = document.querySelector('#tabelaAtivos tbody');
-            tbody.innerHTML = ""; // Limpa tabela
-
-            // Lógica de paginação manual
-            const inicio = (paginaAtual - 1) * itensPorPagina;
-            const fim = inicio + itensPorPagina;
-
-            // Pega só o pedaço do array necessário
-            const dadosPagina = ativosFiltrados.slice(inicio, fim);
-
-            if (dadosPagina.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='7' style='text-align:center'>Nenhum ativo encontrado.</td></tr>";
-            } else {
-                // Laço simples para criar as linhas
-                for (let i = 0; i < dadosPagina.length; i++) {
-                    const ativo = dadosPagina[i];
-
-
-                    const statusTexto = ativo.status_nome || '-';
-                    const tipoTexto = ativo.tipo_ativo_nome || '-';
-                    const localTexto = ativo.localizacao_nome || '-';
-                    const respTexto = ativo.responsavel_nome || '-';
-
-                    const tr = `
-                        <tr>
-                            <td>${ativo.patrimonio}</td>
-                            <td>${tipoTexto}</td>
-                            <td>${ativo.marca_modelo || '-'}</td>
-                            <td>
-                                <span class="badge ${obterClasseStatus(ativo.id_status)}">
-                                    ${statusTexto}
-                                </span>
-                            </td>
-                            <td>${localTexto}</td>
-                            <td>${respTexto}</td>
-                            <td>${ativo.obs || "-"}</td>
-                            <td>
-                                <div style="display: flex; gap: 15px;">
-                                    <button class="btn-icon" title="Editar" onclick="alert('Editar: ' + '${ativo.patrimonio}')" style="background:none; border:none; cursor:pointer; color: #30933C;">
-                                        <i class="fa-solid fa-pen-to-square" style="font-size: 1.4rem;"></i>
-                                    </button>
-                                    <button class="btn-icon" title="Histórico" onclick="alert('Histórico: ' + '${ativo.patrimonio}')" style="background:none; border:none; cursor:pointer; color: #333;">
-                                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.4rem;"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += tr;
+            function paginaAnterior() {
+                if (paginaAtual > 1) {
+                    paginaAtual--;
+                    atualizarTabela();
                 }
             }
 
-            atualizarBotoesPaginacao();
-        }
-
-        function obterClasseStatus(id) {
-            if (id == 13) return 'badge-info';
-            if (id == 14) return 'badge-warning';
-            if (id == 15) return 'badge-success';
-            return '';
-        }
-
-        function atualizarBotoesPaginacao() {
-            const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
-
-            document.getElementById('infoPaginacao').innerText = `Página ${paginaAtual} de ${totalPaginas || 1}`;
-
-            document.getElementById('btnAnterior').disabled = (paginaAtual === 1);
-            document.getElementById('btnProximo').disabled = (paginaAtual >= totalPaginas || totalPaginas === 0);
-        }
-
-        function paginaAnterior() {
-            if (paginaAtual > 1) {
-                paginaAtual--;
-                atualizarTabela();
+            function proximaPagina() {
+                const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
+                if (paginaAtual < totalPaginas) {
+                    paginaAtual++;
+                    atualizarTabela();
+                }
             }
-        }
-
-        function proximaPagina() {
-            const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
-            if (paginaAtual < totalPaginas) {
-                paginaAtual++;
-                atualizarTabela();
-            }
-        }
+        });
     </script>
 </body>
 

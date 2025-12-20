@@ -5,16 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login :: SGI | IFG </title>
-    <!-- Fontes Externas - Mantidas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- CSS Consolidado -->
     <style>
-        /* Variáveis Globais (:root) originais de styles.css */
         :root {
             --ifg-green: #30933C;
             --ifg-green-dark: #1f6b29;
@@ -29,7 +26,6 @@
             --transition-speed: 0.3s;
         }
 
-        /* Reset Global */
         * {
             margin: 0;
             padding: 0;
@@ -224,7 +220,6 @@
         .input-wrapper input {
             width: 100%;
             padding: 0.9rem 1rem 0.9rem 2.8rem;
-            /* Espaço para ícone se houver */
             font-size: 1rem;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -279,7 +274,6 @@
             font-family: var(--font-body);
             font-weight: 500;
             display: none;
-            /* Inicialmente oculto */
         }
 
         .card-footer {
@@ -385,8 +379,6 @@
             </div>
         </div>
     </div>
-
-    <!-- JavaScript Consolidado -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const formulario = document.getElementById('loginForm');
