@@ -35,9 +35,9 @@ export async function listar(req: Request, res: Response) {
     }
 }
 
-export async function getDashboardStats(req: Request, res: Response) {
+export async function obterDadosDashboard(req: Request, res: Response) {
     try {
-        const dados = await ativoService.getDashboardData();
+        const dados = await ativoService.obterDadosDashboard();
         res.status(200).json(dados);
     } catch (error) {
         console.error('Erro no controller de dashboard:', error);
@@ -45,9 +45,9 @@ export async function getDashboardStats(req: Request, res: Response) {
     }
 }
 
-export async function getMovimentacoes(req: Request, res: Response) {
+export async function obterMovimentacoes(req: Request, res: Response) {
     try {
-        const movimentacoes = await ativoService.getMovimentacoesRecentes();
+        const movimentacoes = await ativoService.obterMovimentacoesRecentes();
         res.status(200).json(movimentacoes);
     } catch (error) {
         console.error('Erro ao buscar movimentações:', error);

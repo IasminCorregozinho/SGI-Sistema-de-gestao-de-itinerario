@@ -3,17 +3,17 @@ import { Ativo } from '../models/ativo';
 
 export async function cadastrarAtivo(dados: Ativo) {
     // verificar se o patrimônio já existe
-    const novoAtivo = await ativoRepo.create(dados);
+    const novoAtivo = await ativoRepo.criar(dados);
     return novoAtivo;
 }
 
 export async function listarAtivos() {
-    return await ativoRepo.findAll();
+    return await ativoRepo.buscarTodos();
 }
 
 export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
     // Status atual do ativo no banco
-    const ativoAntigo = await ativoRepo.findById(id);
+    const ativoAntigo = await ativoRepo.buscarPorId(id);
 
     if (!ativoAntigo) {
         throw new Error('Ativo não encontrado');
@@ -26,7 +26,7 @@ export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
 
     // se houve mudança crítica, registra no histórico
     if (mudouStatus || mudouLocal || mudouResponsavel) {
-        await ativoRepo.createHistorico({
+        await ativoRepo.registrarHistorico({
             ativo_id: id,
             usuario_alteracao: 1,
             status_anterior: ativoAntigo.id_status,
@@ -40,14 +40,14 @@ export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
     }
 
     // atualizar o cadastro principal
-    const ativoAtualizado = await ativoRepo.update(id, dadosNovos);
+    const ativoAtualizado = await ativoRepo.atualizar(id, dadosNovos);
     return ativoAtualizado;
 }
 
 
 
-export async function getDashboardData() {
-    const stats = await ativoRepo.getDashboardStats();
+export async function obterDadosDashboard() {
+    const stats = await ativoRepo.obterDadosDashboard();
 
     return {
         total: stats?.total || 0,
@@ -57,6 +57,6 @@ export async function getDashboardData() {
     };
 }
 
-export async function getMovimentacoesRecentes() {
-    return await ativoRepo.getUltimasMovimentacoes();
+export async function obterMovimentacoesRecentes() {
+    return await ativoRepo.obterMovimentacoesRecentes();
 }

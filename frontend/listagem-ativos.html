@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI :: Listagem de Ativos</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            align-items: center;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--bg-light);
+            border-color: var(--ifg-green);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .filter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+            <div class="logo-area" style="text-align: center; margin-bottom: 2rem;">
+                <img src="images/logo_ifg.png" alt="Logo IFG"
+                    style="width: 100%; max-width: 140px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" onclick="abrirModal()" class="menu-item">
+                    <i class="fa-solid fa-plus"></i> Cadastrar Ativo
+                </a>
+                <a href="listagem-ativos.html" class="menu-item" style="background-color: var(--ifg-green-dark);">
+                    <i class="fa-solid fa-list"></i> Listagem de Ativos
+                </a>
+                <a href="#" class="menu-item" id="menuGerenciarPerfis" onclick="abrirModalGerenciarPerfis()"
+                    style="display: none;">
+                    <i class="fa-solid fa-users-gear"></i> Gerenciar Perfis
+                </a>
+                <a href="#" class="menu-item" style="margin-top: auto;" onclick="logout()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content">
+
+            <header>
+                <div>
+                    <h1>Listagem de Ativos</h1>
+                    <p>Gerencie e consulte todos os ativos cadastrados</p>
+                </div>
+                <div class="actions">
+                    <a href="dashboard.html" class="btn-primary">
+                        <i class="fa-solid fa-house"></i> Dashboard
+                    </a>
+                </div>
+            </header>
+
+            <!-- Mensagens do Sistema -->
+            <div id="divMensagemSistema"
+                style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: 500;">
+            </div>
+
+            <!-- Filtros de Busca -->
+            <section class="filter-section">
+                <h3><i class="fa-solid fa-filter"></i> Filtros de Busca</h3>
+                <br>
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label>Patrimônio</label>
+                        <input type="text" id="filtro_patrimonio" onkeyup="aplicarFiltros()">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="filtro_status" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="13">Em uso</option>
+                            <option value="14">Em manutenção</option>
+                            <option value="15">Em estoque</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Localização</label>
+                        <select id="filtro_localizacao" onchange="aplicarFiltros()">
+                            <option value="">Todas</option>
+                            <option value="11">Recursos Humanos</option>
+                            <option value="12">Financeiro</option>
+                            <option value="15">Recepção Central</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsável</label>
+                        <select id="filtro_responsavel" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="1">Usuário Suporte</option>
+                            <option value="4">Fabiana Chaves</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca/Modelo</label>
+                        <input type="text" id="filtro_marca" onkeyup="aplicarFiltros()">
+                    </div>
+                    <div class="form-group">
+                        <label>Observação</label>
+                        <input type="text" id="filtro_obs" onkeyup="aplicarFiltros()">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabela de Resultados -->
+            <section class="table-container">
+                <table id="tabelaAtivos">
+                    <thead>
+                        <tr>
+                            <th>Patrimônio</th>
+                            <th>Tipo</th>
+                            <th>Marca/Modelo</th>
+                            <th>Status</th>
+                            <th>Localização</th>
+                            <th>Responsável</th>
+                            <th>Observação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Paginação -->
+            <div class="pagination">
+                <span id="infoPaginacao">Página 1 de 1</span>
+                <button onclick="paginaAnterior()" id="btnAnterior" disabled>Anterior</button>
+                <button onclick="proximaPagina()" id="btnProximo" disabled>Próxima</button>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="modalCadastro" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="fecharModal()">&times;</span>
+            <h2>Cadastrar Novo Ativo</h2>
+
+            <div id="msgCadastro"
+                style="display: none; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
+            </div>
+
+            <form id="formAtivo" onsubmit="salvarAtivo(event)">
+                <div class="form-group">
+                    <label>Nº Patrimônio</label>
+                    <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Ativo</label>
+                    <select id="tipo_ativo">
+                        <option value="10">Computador</option>
+                        <option value="11">Monitor</option>
+                        <option value="12">Impressora</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Marca / Modelo</label>
+                    <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="13">Em uso</option>
+                        <option value="14">Em manutenção</option>
+                        <option value="15">Em estoque</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Localização</label>
+                    <select id="localizacao">
+                        <option value="11">Recursos Humanos</option>
+                        <option value="12">Financeiro</option>
+                        <option value="15">Recepção Central</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <select id="responsavel">
+                        <option value="1">Usuário Suporte</option>
+                        <option value="4">Fabiana Chaves</option>
+                    </select>
+                </div>
+
+                <div class="form-group span-2">
+                    <label>Observações</label>
+                    <textarea id="observacoes" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-salvar">Salvar Ativo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis para controlar os dados e paginação
+        let todosAtivos = [];
+        let ativosFiltrados = [];
+        let paginaAtual = 1;
+        const itensPorPagina = 50;
+
+        const API_BASE = '/ativos';
+
+        // Função executada quando a tela carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarAtivos();
+            verificarLogin();
+        });
+
+        function verificarLogin() {
+            const userStr = localStorage.getItem('usuario');
+            if (!userStr) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('usuario');
+            window.location.href = 'index.html';
+        }
+
+        // Funções do Modal (iguais ao Dashboard)
+        function abrirModal() {
+            document.getElementById('modalCadastro').style.display = 'flex';
+        }
+        function fecharModal() {
+            document.getElementById('modalCadastro').style.display = 'none';
+        }
+
+        // Busca os dados do backend
+        async function carregarAtivos() {
+            const divMsg = document.getElementById('divMensagemSistema');
+            divMsg.style.display = 'none';
+
+            try {
+                // Fetch simples
+                const resposta = await fetch(API_BASE);
+                if (resposta.ok) {
+                    todosAtivos = await resposta.json();
+                    ativosFiltrados = todosAtivos;
+                    atualizarTabela();
+                } else {
+                    mostrarMensagem('divMensagemSistema', "Erro ao buscar ativos.", true);
+                }
+            } catch (erro) {
+                console.error(erro);
+                mostrarMensagem('divMensagemSistema', "Erro de conexão.", true);
+            }
+        }
+
+        function mostrarMensagem(elementId, texto, isErro = false) {
+            const divMsg = document.getElementById(elementId);
+            if (!divMsg) return;
+
+            divMsg.innerText = texto;
+            divMsg.style.display = 'block';
+
+            if (isErro) {
+                divMsg.style.backgroundColor = '#fee2e2';
+                divMsg.style.color = '#991b1b';
+                divMsg.style.border = '1px solid #fecaca';
+            } else {
+                divMsg.style.backgroundColor = '#d1fae5';
+                divMsg.style.color = '#065f46';
+                divMsg.style.border = '1px solid #a7f3d0';
+            }
+
+            // Ocultar após 5 segundos
+            setTimeout(() => {
+                divMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        async function salvarAtivo(event) {
+            event.preventDefault();
+
+            const dadosAtivo = {
+                patrimonio: document.getElementById('patrimonio').value,
+                id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
+                marca_modelo: document.getElementById('marca_modelo').value,
+                id_status: parseInt(document.getElementById('status').value),
+                id_localizacao: parseInt(document.getElementById('localizacao').value),
+                id_responsavel: parseInt(document.getElementById('responsavel').value),
+                obs: document.getElementById('observacoes').value
+            };
+
+            // Limpa mensagem do modal antes de tentar
+            document.getElementById('msgCadastro').style.display = 'none';
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosAtivo)
+                });
+
+                if (response.ok) {
+                    fecharModal();
+                    document.getElementById('formAtivo').reset();
+                    carregarAtivos();
+
+                    // Mostra sucesso na tela de listagem
+                    mostrarMensagem('divMensagemSistema', 'Ativo cadastrado com sucesso!', false);
+                } else {
+                    // Mostra erro no modal
+                    mostrarMensagem('msgCadastro', 'Erro ao salvar.', true);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                // Mostra erro no modal
+                mostrarMensagem('msgCadastro', 'Erro de conexão.', true);
+            }
+        }
+
+        function aplicarFiltros() {
+            // Pega os valores dos inputs
+            const fPatrimonio = document.getElementById('filtro_patrimonio').value.toLowerCase();
+            const fStatus = document.getElementById('filtro_status').value;
+            const fLocal = document.getElementById('filtro_localizacao').value;
+            const fResp = document.getElementById('filtro_responsavel').value;
+            const fMarca = document.getElementById('filtro_marca').value.toLowerCase();
+            const fObs = document.getElementById('filtro_obs').value.toLowerCase();
+
+            // Filtra o array principal
+            ativosFiltrados = todosAtivos.filter(ativo => {
+                // Checa patrimônio
+                const conferePat = (ativo.patrimonio || "").toLowerCase().includes(fPatrimonio);
+
+                // Checa status (se filtro vazio, aceita todos)
+                const confereStatus = fStatus === "" || ativo.id_status == fStatus;
+
+                // Checa localização
+                const confereLocal = fLocal === "" || ativo.id_localizacao == fLocal;
+
+                // Checa responsável
+                const confereResp = fResp === "" || ativo.id_responsavel == fResp;
+
+                // Checa marca
+                const confereMarca = (ativo.marca_modelo || "").toLowerCase().includes(fMarca);
+
+                // Checa obs
+                const confereObs = (ativo.obs || "").toLowerCase().includes(fObs);
+
+                // Só retorna true se TODOS conferem
+                return conferePat && confereStatus && confereLocal && confereResp && confereMarca && confereObs;
+            });
+
+            // Volta para página 1 sempre que filtra
+            paginaAtual = 1;
+            atualizarTabela();
+        }
+
+        // Função que desenha a tabela
+        function atualizarTabela() {
+            const tbody = document.querySelector('#tabelaAtivos tbody');
+            tbody.innerHTML = ""; // Limpa tabela
+
+            // Lógica de paginação manual
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+
+            // Pega só o pedaço do array necessário
+            const dadosPagina = ativosFiltrados.slice(inicio, fim);
+
+            if (dadosPagina.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='7' style='text-align:center'>Nenhum ativo encontrado.</td></tr>";
+            } else {
+                // Laço simples para criar as linhas
+                for (let i = 0; i < dadosPagina.length; i++) {
+                    const ativo = dadosPagina[i];
+
+
+                    const statusTexto = ativo.status_nome || '-';
+                    const tipoTexto = ativo.tipo_ativo_nome || '-';
+                    const localTexto = ativo.localizacao_nome || '-';
+                    const respTexto = ativo.responsavel_nome || '-';
+
+                    const tr = `
+                        <tr>
+                            <td>${ativo.patrimonio}</td>
+                            <td>${tipoTexto}</td>
+                            <td>${ativo.marca_modelo || '-'}</td>
+                            <td>
+                                <span class="badge ${obterClasseStatus(ativo.id_status)}">
+                                    ${statusTexto}
+                                </span>
+                            </td>
+                            <td>${localTexto}</td>
+                            <td>${respTexto}</td>
+                            <td>${ativo.obs || "-"}</td>
+                            <td>
+                                <div style="display: flex; gap: 15px;">
+                                    <button class="btn-icon" title="Editar" onclick="alert('Editar: ' + '${ativo.patrimonio}')" style="background:none; border:none; cursor:pointer; color: #30933C;">
+                                        <i class="fa-solid fa-pen-to-square" style="font-size: 1.4rem;"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Histórico" onclick="alert('Histórico: ' + '${ativo.patrimonio}')" style="background:none; border:none; cursor:pointer; color: #333;">
+                                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.4rem;"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += tr;
+                }
+            }
+
+            atualizarBotoesPaginacao();
+        }
+
+        function obterClasseStatus(id) {
+            if (id == 13) return 'badge-info';
+            if (id == 14) return 'badge-warning';
+            if (id == 15) return 'badge-success';
+            return '';
+        }
+
+        function atualizarBotoesPaginacao() {
+            const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
+
+            document.getElementById('infoPaginacao').innerText = `Página ${paginaAtual} de ${totalPaginas || 1}`;
+
+            document.getElementById('btnAnterior').disabled = (paginaAtual === 1);
+            document.getElementById('btnProximo').disabled = (paginaAtual >= totalPaginas || totalPaginas === 0);
+        }
+
+        function paginaAnterior() {
+            if (paginaAtual > 1) {
+                paginaAtual--;
+                atualizarTabela();
+            }
+        }
+
+        function proximaPagina() {
+            const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
+            if (paginaAtual < totalPaginas) {
+                paginaAtual++;
+                atualizarTabela();
+            }
+        }
+    </script>
+</body>
+
+</html>

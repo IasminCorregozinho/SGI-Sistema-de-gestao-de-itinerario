@@ -13,102 +13,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 9999 !important;
-            justify-content: center;
-            align-items: center;
-        }
 
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 700px;
-            max-width: 90%;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        .close-btn {
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Form Grid Layout */
-        #formAtivo {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 0;
-            /* Let grid gap handle spacing */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: inherit;
-        }
-
-        .span-2 {
-            grid-column: span 2;
-        }
-
-        .btn-salvar {
-            grid-column: span 2;
-            padding: 12px;
-            background-color: #30933C;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .btn-salvar:hover {
-            background-color: #1f6b29;
-        }
-
-        @media (max-width: 768px) {
-            .modal-box {
-                width: 95%;
-                padding: 20px;
-            }
-
-            #formAtivo {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .span-2 {
-                grid-column: span 1;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -128,8 +33,8 @@
                 <a href="#" onclick="abrirModal()" class="menu-item">
                     <i class="fa-solid fa-plus"></i> Cadastrar Ativo
                 </a>
-                <a href="#" class="menu-item">
-                    <i class="fa-solid fa-list"></i> Listagem
+                <a href="listagem-ativos.html" class="menu-item">
+                    <i class="fa-solid fa-list"></i> Listagem Ativos
                 </a>
                 <a href="#" class="menu-item" id="menuGerenciarPerfis" onclick="abrirModalGerenciarPerfis()"
                     style="display: none;">
@@ -149,20 +54,18 @@
                     <p>Visão geral dos ativos de TI</p>
                 </div>
 
-                <div class="actions">
-                    <input type="text" class="search-bar" placeholder="Buscar por Tag, Serial ou Nome...">
+                <!-- Mensagem Global do Sistema -->
+                <div id="divMensagemSistema"
+                    style="display: none; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center; font-weight: 500;">
+                </div>
 
+                <div class="actions">
                     <button class="btn-primary" onclick="abrirModal()">
                         <i class="fa-solid fa-plus"></i> Novo Ativo
                     </button>
 
-                    <a href="" class="btn-primary">
-                        <i class="fa-solid fa-pen-to-square"></i> Editar Ativo
-                    </a>
-                    <a href="" class="btn-primary">
-                        <i class="fa-solid fa-clock-rotate-left"></i> Histórico Ativo
-                    </a>
-                    <a href="" class="btn-primary">
+
+                    <a href="listagem-ativos.html" class="btn-primary">
                         <i class="fa-solid fa-list"></i> Listagem Ativos
                     </a>
                 </div>
@@ -229,6 +132,10 @@
         <div class="modal-box">
             <span class="close-btn" onclick="fecharModal()">&times;</span>
             <h2>Cadastrar Novo Ativo</h2>
+
+            <div id="msgCadastro"
+                style="display: none; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
+            </div>
 
             <form id="formAtivo" onsubmit="salvarAtivo(event)">
                 <div class="form-group">
@@ -312,7 +219,7 @@
                     <div class="form-group">
                         <label>Tipo de Perfil</label>
                         <select id="conf_perfil_id">
-                            <option value="1">Suporte (Padrão)</option>
+                            <option value="1">Suporte</option>
                             <option value="2">Coordenação</option>
                         </select>
                     </div>
@@ -360,7 +267,7 @@
     </div>
 
     <script>
-        // 1. FUNÇÕES DO MODAL (NO TOPO)
+        //FUNÇÕES DO MODAL
         function abrirModal() {
             const modal = document.getElementById('modalCadastro');
             if (modal) {
@@ -385,11 +292,11 @@
             if (event.target == modalConfirm) fecharModalConfirmacao();
         }
 
-        // 2. LÓGICA DO DASHBOARD
+        //LÓGICA DO DASHBOARD
         const API_BASE = '/ativos';
         const API_USERS = '/users';
 
-        // --- Lógica de Gerenciar Perfis ---
+        //Gerenciar Perfis
         function abrirModalGerenciarPerfis() {
             const modal = document.getElementById('modalGerenciarPerfis');
             if (modal) {
@@ -424,8 +331,8 @@
                     // Sucesso
                     msgDiv.innerText = 'Usuário criado com sucesso!';
                     msgDiv.style.display = 'block';
-                    msgDiv.style.backgroundColor = '#d1fae5'; // Fundo verde claro
-                    msgDiv.style.color = '#065f46'; // Texto verde escuro
+                    msgDiv.style.backgroundColor = '#d1fae5';
+                    msgDiv.style.color = '#065f46';
                     msgDiv.style.border = '1px solid #a7f3d0';
 
                     document.getElementById('conf_nome').value = '';
@@ -433,7 +340,7 @@
                     document.getElementById('conf_senha').value = '';
                     listarPerfis();
 
-                    // Esconder mensagem após 3 segundos
+                    // Esconde mensagem após 3 segundos
                     setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
                 } else {
                     // Erro
@@ -444,13 +351,13 @@
                 console.error(error);
                 msgDiv.innerText = error.message || 'Erro de conexão';
                 msgDiv.style.display = 'block';
-                msgDiv.style.backgroundColor = '#fee2e2'; // Fundo vermelho claro
-                msgDiv.style.color = '#991b1b'; // Texto vermelho escuro
+                msgDiv.style.backgroundColor = '#fee2e2';
+                msgDiv.style.color = '#991b1b';
                 msgDiv.style.border = '1px solid #fecaca';
             }
         }
 
-        async function removeProfile(id) {
+        async function removerPerfil(id) {
             idParaExcluir = id;
             const modal = document.getElementById('modalConfirmacao');
             modal.style.display = 'flex';
@@ -464,11 +371,10 @@
         async function executarExclusao() {
             if (!idParaExcluir) return;
 
-            const id = idParaExcluir; // Salvar ID localmente
+            const id = idParaExcluir;
             const msgDiv = document.getElementById('msgLista');
             msgDiv.style.display = 'none';
 
-            // Fechar modal de confirmação antes de prosseguir
             fecharModalConfirmacao();
 
             try {
@@ -510,7 +416,7 @@
                                 <td>${p.matricula}</td>
                                 <td>${tipoPerfil}</td>
                                 <td>
-                                    <button onclick="removeProfile(${p.responsavel_id})" class="btn-delete">
+                                    <button onclick="removerPerfil(${p.responsavel_id})" class="btn-delete">
                                         Excluir
                                     </button>
                                 </td>
@@ -527,7 +433,7 @@
             const userStr = localStorage.getItem('usuario');
             if (userStr) {
                 const user = JSON.parse(userStr);
-                // ID 2 é Coordenação
+                // ID 2 - Coordenação
                 if (user.perfil_id === 2) {
                     document.getElementById('menuGerenciarPerfis').style.display = 'block';
                 } else {
@@ -541,11 +447,11 @@
         async function carregarDashboard() {
             try {
                 // KPIs
-                const responseKpi = await fetch(`${API_BASE}/dashboard-kpis`);
+                const respostaKpi = await fetch(`${API_BASE}/dashboard-kpis`);
                 let dados = {};
 
-                if (responseKpi.ok) {
-                    dados = await responseKpi.json();
+                if (respostaKpi.ok) {
+                    dados = await respostaKpi.json();
 
                     if (document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = dados.total || 0;
                     if (document.getElementById('kpi-estoque')) document.getElementById('kpi-estoque').innerText = dados.estoque || 0;
@@ -586,9 +492,9 @@
                 }
 
                 // Tabela
-                const responseMov = await fetch(`${API_BASE}/movimentacoes-recentes`);
-                if (responseMov.ok) {
-                    const listaMovimentacoes = await responseMov.json();
+                const respostaMov = await fetch(`${API_BASE}/movimentacoes-recentes`);
+                if (respostaMov.ok) {
+                    const listaMovimentacoes = await respostaMov.json();
                     const tbody = document.querySelector('tbody');
                     if (tbody) {
                         tbody.innerHTML = '';
@@ -625,7 +531,7 @@
             }
         }
 
-        // 3. FUNÇÃO DE SALVAR
+        //FUNÇÃO DE SALVAR
         async function salvarAtivo(event) {
             event.preventDefault();
 
@@ -639,6 +545,9 @@
                 obs: document.getElementById('observacoes').value
             };
 
+            // Limpa mensagem do modal antes de tentar
+            document.getElementById('msgCadastro').style.display = 'none';
+
             try {
                 const response = await fetch(API_BASE, {
                     method: 'POST',
@@ -649,20 +558,47 @@
                 });
 
                 if (response.ok) {
-                    alert('Ativo cadastrado com sucesso!');
                     fecharModal();
                     document.getElementById('formAtivo').reset();
                     carregarDashboard();
+
+                    // Mostra sucesso no dashboard
+                    mostrarMensagem('divMensagemSistema', 'Ativo cadastrado com sucesso!', false);
                 } else {
-                    alert('Erro ao salvar.');
+                    // Mostra erro no modal
+                    mostrarMensagem('msgCadastro', 'Erro ao salvar.', true);
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                alert('Erro de conexão.');
+                // Mostra erro no modal
+                mostrarMensagem('msgCadastro', 'Erro de conexão.', true);
             }
         }
 
-        // 4. FUNÇÃO DE LOGOUT
+        function mostrarMensagem(elementId, texto, isErro = false) {
+            const divMsg = document.getElementById(elementId);
+            if (!divMsg) return;
+
+            divMsg.innerText = texto;
+            divMsg.style.display = 'block';
+
+            if (isErro) {
+                divMsg.style.backgroundColor = '#fee2e2';
+                divMsg.style.color = '#991b1b';
+                divMsg.style.border = '1px solid #fecaca';
+            } else {
+                divMsg.style.backgroundColor = '#d1fae5';
+                divMsg.style.color = '#065f46';
+                divMsg.style.border = '1px solid #a7f3d0';
+            }
+
+            // Ocultar após 5 segundos
+            setTimeout(() => {
+                divMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        //FUNÇÃO DE LOGOUT
         function logout() {
             // Redireciona para a tela de login
             window.location.href = 'index.html';
