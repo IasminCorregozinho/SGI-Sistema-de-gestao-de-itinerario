@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    const matriculaInput = document.getElementById('matricula');
-    const senhaInput = document.getElementById('senha');
+    const formulario = document.getElementById('loginForm');
+    const inputMatricula = document.getElementById('matricula');
+    const inputSenha = document.getElementById('senha');
 
-    form.addEventListener('submit', async (e) => {
+    formulario.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // 1. Limpar mensagens de erro anteriores
-        const errorDiv = document.getElementById('loginError');
-        errorDiv.style.display = 'none';
-        errorDiv.innerText = '';
+        //Limpar mensagens de erro anteriores
+        const divErro = document.getElementById('loginError');
+        divErro.style.display = 'none';
+        divErro.innerText = '';
 
-        const matricula = matriculaInput.value;
-        const senha = senhaInput.value;
+        const matricula = inputMatricula.value;
+        const senha = inputSenha.value;
 
         // Validação básica ou log
         console.log('Tentativa de login:', {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const response = await fetch('/users/login', {
+            const resposta = await fetch('/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -29,24 +29,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ matricula, senha })
             });
 
-            const data = await response.json();
+            const dados = await resposta.json();
 
-            if (response.ok) {
+            if (resposta.ok) {
                 // SUCESSO: Redireciona para o Dashboard
                 console.log('Login com sucesso, redirecionando...');
-                // Salvar dados do usuário para controle de acesso (Sessão simples)
-                localStorage.setItem('usuario', JSON.stringify(data.user));
+                // Salvar dados do usuário para controle de acesso
+                localStorage.setItem('usuario', JSON.stringify(dados.user));
                 window.location.href = 'dashboard.html';
             } else {
                 // ERRO: Mostrar mensagem no container
-                errorDiv.innerText = "Nome de usuário ou senha errados. Por favor tente outra vez.";
-                errorDiv.style.display = 'block';
+                divErro.innerText = "Nome de usuário ou senha errados. Por favor tente outra vez.";
+                divErro.style.display = 'block';
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
             // Erros genéricos de conexão
-            errorDiv.innerText = "Erro de conexão com o servidor. Tente novamente mais tarde.";
-            errorDiv.style.display = 'block';
+            divErro.innerText = "Erro de conexão com o servidor. Tente novamente mais tarde.";
+            divErro.style.display = 'block';
         }
     });
 });

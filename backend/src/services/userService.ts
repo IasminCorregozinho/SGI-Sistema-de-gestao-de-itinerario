@@ -1,21 +1,21 @@
-import { findUserByMatricula, createUser, User } from "../models/userModel";
+import { buscarUsuarioPorMatricula, criarUsuario, User } from "../models/userModel";
 import { pool } from "../config/db";
 
-export async function registerUser(user: User) {
-  const exists = await findUserByMatricula(user.matricula);
+export async function registrarUsuario(user: User) {
+  const exists = await buscarUsuarioPorMatricula(user.matricula);
   if (exists) throw new Error("Matrícula já cadastrada");
-  return await createUser(user);
+  return await criarUsuario(user);
 }
 
-export async function loginUser(matricula: string, senha: string) {
-  const user = await findUserByMatricula(matricula);
+export async function realizarLogin(matricula: string, senha: string) {
+  const user = await buscarUsuarioPorMatricula(matricula);
   if (!user) throw new Error("Usuário não encontrado");
   if (user.senha !== senha) throw new Error("Senha incorreta! Por favor verifique a senha digitada.");
   return user;
 }
 
 // RF002: Inclusão de perfis (Criação de novos usuários com perfil definido)
-export async function createProfile(nome: string, matricula: string, senha: string, perfil_id: number = 1) {
+export async function criarPerfil(nome: string, matricula: string, senha: string, perfil_id: number = 1) {
   // Por padrão, cria com perfil 1 (Suporte) se não especificado
   const client = await pool.connect();
   try {
@@ -35,7 +35,7 @@ export async function createProfile(nome: string, matricula: string, senha: stri
 }
 
 // RF002: Exclusão de perfis (Exclusão de usuários)
-export async function deleteProfile(id: number) {
+export async function excluirPerfil(id: number) {
   const result = await pool.query(
     "DELETE FROM responsavel WHERE responsavel_id = $1 RETURNING *",
     [id]
@@ -48,7 +48,7 @@ export async function deleteProfile(id: number) {
 }
 
 // Auxiliar: Consulta de perfis (Listagem de usuários cadastrados)
-export async function getProfiles() {
+export async function listarPerfis() {
   const result = await pool.query("SELECT * FROM responsavel ORDER BY responsavel_id ASC");
   return result.rows;
 }
