@@ -15,6 +15,7 @@ export interface Ativo {
     status_nome?: string;
     localizacao_nome?: string;
     responsavel_nome?: string;
+    valor_manutencao?: number; // Campo transiente para atualização
 }
 
 // interface para o Histórico
@@ -28,4 +29,5 @@ export interface HistoricoAtivo {
     responsavel_anterior: number | null;
     responsavel_novo: number;
     observacao: string;
+    valor_manutencao?: number;
 }
