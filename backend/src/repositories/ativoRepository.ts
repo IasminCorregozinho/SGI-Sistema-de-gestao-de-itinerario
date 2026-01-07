@@ -20,6 +20,21 @@ export async function buscarPorId(id: number): Promise<Ativo | null> {
         } as Ativo;
     }
     return null;
+    return null;
+}
+
+// Buscar um ativo pelo Patrimônio
+export async function buscarPorPatrimonio(patrimonio: string): Promise<Ativo | null> {
+    const result = await pool.query('SELECT * FROM ATIVO WHERE patrimonio = $1', [patrimonio]);
+
+    if (result.rows.length > 0) {
+        const row = result.rows[0];
+        return {
+            id: row.ativo_id,
+            patrimonio: row.patrimonio
+        } as Ativo;
+    }
+    return null;
 }
 
 // Buscar todos os ativos
@@ -29,7 +44,7 @@ export async function buscarTodos(): Promise<Ativo[]> {
             a.*, 
             s.descricao as status_nome,
             t.descricao as tipo_ativo_nome,
-            l.nome_setor as localizacao_nome,
+            COALESCE(l.setor_sala, l.reitoria, 'Sem Nome') as localizacao_nome,
             r.nome as responsavel_nome
         FROM ATIVO a
         LEFT JOIN STATUS_ATIVO s ON a.status = s.status_id
@@ -40,7 +55,7 @@ export async function buscarTodos(): Promise<Ativo[]> {
     const result = await pool.query(query);
 
     return result.rows.map(row => ({
-        id: row.id,
+        id: row.ativo_id,
         patrimonio: row.patrimonio,
         id_tipo_ativo: row.tipo_ativo,
         id_status: row.status,
@@ -103,18 +118,10 @@ export async function obterDadosDashboard() {
 
     const query = `
         SELECT 
-            -- Conta todas as linhas da tabela (Total de Ativos)
             COUNT(*)::int as total,
-            
-            -- Soma apenas se status for 15 (Em estoque)
             COALESCE(SUM(CASE WHEN status = 15 THEN 1 ELSE 0 END), 0)::int as estoque,
-            
-            -- Soma apenas se status for 14 (Em manutenção)
             COALESCE(SUM(CASE WHEN status = 14 THEN 1 ELSE 0 END), 0)::int as manutencao,
-            
-            -- Soma apenas se status for 16 (Descartado)
             COALESCE(SUM(CASE WHEN status = 16 THEN 1 ELSE 0 END), 0)::int as descartados
-            
         FROM ATIVO
     `;
 
@@ -127,20 +134,58 @@ export async function obterDadosDashboard() {
     }
 }
 
+export async function obterContagemPorCategoria() {
+    const query = `
+        SELECT t.descricao as categoria, COUNT(*) as quantidade
+        FROM ATIVO a
+        JOIN TIPO_ATIVO t ON a.tipo_ativo = t.tipo_ativo_id
+        GROUP BY t.descricao
+        ORDER BY quantidade DESC;
+    `;
+    const result = await pool.query(query);
+    return result.rows;
+}
+
 export async function obterMovimentacoesRecentes() {
     const query = `
         SELECT 
             a.patrimonio as ativo,      
-            h.usuario_alteracao as usuario,
-            s.descricao as acao,       
+            r.nome as usuario,
+            CASE 
+                WHEN h.status_anterior IS NULL THEN 'Cadastro'
+                WHEN h.status_novo = h.status_anterior THEN 'Edição'
+                ELSE s.descricao 
+            END as acao,       
             h.data_movimentacao as data
         FROM historico_ativo h
-        INNER JOIN ATIVO a ON h.ativo_id = a.id
+        INNER JOIN ATIVO a ON h.ativo_id = a.ativo_id
         INNER JOIN STATUS_ATIVO s ON h.status_novo = s.status_id
+        LEFT JOIN RESPONSAVEL r ON h.usuario_alteracao = r.responsavel_id
         ORDER BY h.data_movimentacao DESC
         LIMIT 5
     `;
 
     const result = await pool.query(query);
     return result.rows;
+}
+
+// Buscar todos os status disponíveis
+export async function buscarStatus() {
+    const result = await pool.query('SELECT * FROM STATUS_ATIVO');
+    return result.rows; // { status_id, descricao }
+}
+
+// Buscar todas as localizações disponíveis
+export async function buscarLocalizacoes() {
+    const result = await pool.query(`
+        SELECT localizacao_id, COALESCE(setor_sala, reitoria, 'Sem Nome') as setor_sala, reitoria 
+        FROM localizacao_ativo
+    `);
+    return result.rows; // { localizacao_id, setor_sala, reitoria }
+}
+
+// Buscar todos os tipos de ativo
+export async function buscarTiposAtivo() {
+    const result = await pool.query('SELECT * FROM tipo_ativo');
+    return result.rows; // { tipo_ativo_id, descricao }
 }

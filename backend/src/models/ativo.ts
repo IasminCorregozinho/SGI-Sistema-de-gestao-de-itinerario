@@ -21,11 +21,11 @@ export interface Ativo {
 export interface HistoricoAtivo {
     ativo_id: number;
     usuario_alteracao: number;
-    status_anterior: number;
+    status_anterior: number | null;
     status_novo: number;
-    localizacao_anterior: number;
+    localizacao_anterior: number | null;
     localizacao_novo: number;
-    responsavel_anterior: number;
+    responsavel_anterior: number | null;
     responsavel_novo: number;
     observacao: string;
 }
