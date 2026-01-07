@@ -258,8 +258,13 @@
         #tabelaAtivos th,
         #tabelaAtivos td {
             font-family: var(--font-body);
-            font-size: 0.95rem;
+            font-size: 13px;
+            /* Reduzido para seguir padrão (13px) */
+            font-weight: 500;
+            /* Medium weight */
             vertical-align: middle;
+            padding: 16px 12px;
+            /* Adicionado para garantir o layout exato */
         }
 
         thead tr {
@@ -325,6 +330,44 @@
             position: relative;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             animation: fadeIn 0.3s ease;
+            overflow: hidden;
+            /* Importante para o círculo vermelho */
+            border-top: none;
+        }
+
+        /* Ajuste específico para o modal de Gerenciar Perfis */
+        #modalGerenciarPerfis .modal-box {
+            width: 900px;
+            max-width: 95%;
+        }
+
+        /* Estilos Decorativos (IFG Theme) - Aplicados a TODOS os modais com .modal-box */
+
+        /* Faixa Degradê Superior */
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--ifg-green), var(--ifg-red));
+            z-index: 10;
+        }
+
+        /* Detalhe Vermelho Canto Superior Direito */
+        .modal-box::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 150px;
+            height: 150px;
+            background-color: var(--ifg-red);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
         }
 
         #formAtivo {
@@ -411,23 +454,38 @@
 
         .modal-box h2 {
             font-family: var(--font-heading);
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
+            margin-bottom: 2rem;
+            color: var(--ifg-green);
+            /* Verde IFG */
+            text-align: center;
+            /* Centralizado */
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Botão de fechar (X) */
+        /* Botão de fechar (X) - Centralizado e Flex */
         .close-btn {
             position: absolute;
             top: 15px;
             right: 20px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 24px;
             cursor: pointer;
             color: var(--text-secondary);
-            transition: color 0.2s;
+            transition: all 0.2s;
+            border-radius: 50%;
+            line-height: 1;
+            z-index: 20;
         }
 
         .close-btn:hover {
             color: var(--ifg-red);
+            background-color: rgba(234, 54, 54, 0.1);
         }
 
         /* Estilos simples do formulário */
@@ -545,7 +603,7 @@
         <aside class="sidebar">
             <div class="logo-area" style="text-align: center; margin-bottom: 2rem;">
                 <img src="images/logo_ifg.png" alt="Logo IFG"
-                    style="width: 100%; max-width: 140px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    style="width: 100%; max-width: 180px; height: auto; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-color: white; padding: 10px;">
             </div>
 
             <nav>
@@ -689,7 +747,7 @@
                 <div id="msgLista"
                     style="margin-bottom: 10px; display: none; padding: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
                 </div>
-                <div style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                <div style="margin-top: 10px; max-height: 400px; overflow-y: auto;">
                     <table id="tabelaPerfis" style="width: 100%;">
                         <thead>
                             <tr>
@@ -912,7 +970,7 @@
                                         if (acaoLower === 'cadastro') {
                                             corBadge = 'background-color: #d1fae5; color: #065f46;'; // Verde (Success)
                                         } else if (acaoLower === 'edição') {
-                                            corBadge = 'background-color: #e0f2fe; color: #0369a1;'; // Azul (Info)
+                                            corBadge = 'background-color: #ffedd5; color: #c2410c;'; // Laranja Pastel (Edição)
                                         } else if (acaoLower.includes('manutenção')) {
                                             corBadge = 'background-color: #fff3cd; color: #856404;'; // Amarelo (Warning)
                                         } else if (acaoLower.includes('descartado')) {
