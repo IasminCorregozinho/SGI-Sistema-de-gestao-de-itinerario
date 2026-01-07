@@ -15,6 +15,7 @@ router.get('/movimentacoes-recentes', ativoController.obterMovimentacoes);
 router.get('/status', ativoController.listarStatus);
 router.get('/localizacoes', ativoController.listarLocalizacoes);
 router.get('/tipos', ativoController.listarTiposAtivo);
+router.get('/:id/historico', ativoController.listarHistorico);
 
 export default router;
 

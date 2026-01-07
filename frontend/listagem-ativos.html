@@ -575,14 +575,40 @@
         </main>
     </div>
 
+    <!-- Modal de Histórico -->
+    <div id="modalHistorico" class="modal-overlay" style="display: none;">
+        <div class="modal-box" style="width: 800px;">
+            <span class="close-btn" id="fecharModalHistorico">&times;</span>
+            <h2 id="tituloHistorico">Histórico do Ativo</h2>
+
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc; text-align: left;">
+                            <th style="padding: 10px; border-bottom: 2px solid #e2e8f0; width: 25%;">Data</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #e2e8f0; width: 40%;">Alterações</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #e2e8f0; width: 20%;">Observação</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #e2e8f0; width: 15%;">Responsável</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyHistorico">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             let todosAtivos = [];
             let ativosFiltrados = [];
             let paginaAtual = 1;
+            let idAtivoEmEdicao = null;
             const itensPorPagina = 50;
             const API_BASE = '/ativos';
-            const modalCadastro = document.getElementById('modalCadastro');
+            // O modalCadastro vem do arquivo externo, então pegamos pelo ID apenas quando precisar
+
             document.getElementById('btnSair').addEventListener('click', logout);
 
             // Filtros - Eventos
@@ -595,6 +621,14 @@
             // Paginação
             document.getElementById('btnAnterior').addEventListener('click', paginaAnterior);
             document.getElementById('btnProximo').addEventListener('click', proximaPagina);
+
+            // Fechar modal de histórico (Correção: verifica se o elemento existe antes de adicionar evento)
+            const btnFecharHist = document.getElementById('fecharModalHistorico');
+            if (btnFecharHist) {
+                btnFecharHist.addEventListener('click', () => {
+                    document.getElementById('modalHistorico').style.display = 'none';
+                });
+            }
 
             // Inicialização
             carregarAtivos();
@@ -618,7 +652,7 @@
             // Busca os dados do backend
             async function carregarAtivos() {
                 const divMsg = document.getElementById('divMensagemSistema');
-                divMsg.style.display = 'none';
+                if (divMsg) divMsg.style.display = 'none';
 
                 try {
                     const resposta = await fetch(API_BASE);
@@ -652,7 +686,6 @@
                     divMsg.style.border = '1px solid #a7f3d0';
                 }
 
-                // Ocultar após 5 segundos
                 setTimeout(() => {
                     divMsg.style.display = 'none';
                 }, 5000);
@@ -660,30 +693,23 @@
 
             async function carregarOpcoesFiltros() {
                 try {
-                    // Carregar Status (Apenas Filtro)
+                    // Carregar Status
                     const resStatus = await fetch('/ativos/status');
                     if (resStatus.ok) {
                         const statuses = await resStatus.json();
-
-                        // Populate Filtro
                         const selectFiltro = document.getElementById('filtro_status');
-
                         statuses.forEach(s => {
-                            // Option para filtro
                             const optF = document.createElement('option');
                             optF.value = s.status_id;
                             optF.textContent = s.descricao;
                             selectFiltro.appendChild(optF);
                         });
                     }
-
-                    // Carregar Localizações (Apenas Filtro)
+                    // Carregar Localizações
                     const resLocais = await fetch('/ativos/localizacoes');
                     if (resLocais.ok) {
                         const locais = await resLocais.json();
-
                         const selectFiltro = document.getElementById('filtro_localizacao');
-
                         locais.forEach(l => {
                             const optF = document.createElement('option');
                             optF.value = l.localizacao_id;
@@ -691,14 +717,11 @@
                             selectFiltro.appendChild(optF);
                         });
                     }
-
-                    // Carregar Responsáveis (Apenas Filtro)
+                    // Carregar Responsáveis
                     const resResp = await fetch('/users/perfis');
                     if (resResp.ok) {
                         const responsaveis = await resResp.json();
-
                         const selectFiltro = document.getElementById('filtro_responsavel');
-
                         responsaveis.forEach(r => {
                             const optF = document.createElement('option');
                             optF.value = r.responsavel_id;
@@ -706,55 +729,41 @@
                             selectFiltro.appendChild(optF);
                         });
                     }
-
-                    // Tipos de Ativo não são usados no filtro, carregados apenas pelo modal
                 } catch (error) {
                     console.error("Erro ao carregar opções de filtro:", error);
-                    alert("Erro ao carregar opções. Verifique se o servidor está rodando e se você acessou via 'http://localhost:3000'.");
                 }
             }
 
-            // Check protocol
             if (window.location.protocol === 'file:') {
-                alert("Atenção: Você está acessando este arquivo diretamente (file://). As funcionalidades de API não funcionarão. Acesse via http://localhost:3000/listagem-ativos.html");
+                alert("Atenção: Acesse via http://localhost:3000/listagem-ativos.html");
             }
 
-            // salvarAtivo e fecharModal removidos (handled by modal-ativo.js)
-
             function aplicarFiltros() {
-                // Pega os valores dos inputs
                 const fPatrimonio = document.getElementById('filtro_patrimonio').value.toLowerCase();
                 const fStatus = document.getElementById('filtro_status').value;
                 const fLocal = document.getElementById('filtro_localizacao').value;
                 const fResp = document.getElementById('filtro_responsavel').value;
                 const fMarca = document.getElementById('filtro_marca').value.toLowerCase();
 
-
-                // Filtra o array principal
                 ativosFiltrados = todosAtivos.filter(ativo => {
                     const conferePat = (ativo.patrimonio || "").toLowerCase().includes(fPatrimonio);
                     const confereStatus = fStatus === "" || ativo.id_status == fStatus;
                     const confereLocal = fLocal === "" || ativo.id_localizacao == fLocal;
                     const confereResp = fResp === "" || ativo.id_responsavel == fResp;
                     const confereMarca = (ativo.marca_modelo || "").toLowerCase().includes(fMarca);
-
                     return conferePat && confereStatus && confereLocal && confereResp && confereMarca;
                 });
 
-                // Volta para página 1 sempre que filtra
                 paginaAtual = 1;
                 atualizarTabela();
             }
 
             function atualizarTabela() {
                 const tbody = document.querySelector('#tabelaAtivos tbody');
-                tbody.innerHTML = ""; // Limpa tabela
+                tbody.innerHTML = "";
 
-                // Lógica de paginação manual
                 const inicio = (paginaAtual - 1) * itensPorPagina;
                 const fim = inicio + itensPorPagina;
-
-                // Pega só o pedaço do array necessário
                 const dadosPagina = ativosFiltrados.slice(inicio, fim);
 
                 if (dadosPagina.length === 0) {
@@ -762,7 +771,6 @@
                 } else {
                     for (let i = 0; i < dadosPagina.length; i++) {
                         const ativo = dadosPagina[i];
-
                         const statusTexto = ativo.status_nome || '-';
                         const tipoTexto = ativo.tipo_ativo_nome || '-';
                         const localTexto = ativo.localizacao_nome || '-';
@@ -770,44 +778,116 @@
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                                <td>${ativo.patrimonio}</td>
-                                <td>${tipoTexto}</td>
-                                <td>${ativo.marca_modelo || '-'}</td>
-                                <td>
-                                    <span class="badge ${obterClasseStatus(ativo.id_status)}">
-                                        ${statusTexto}
-                                    </span>
-                                </td>
-                                <td>${localTexto}</td>
-                                <td>${respTexto}</td>
-                                <td>${ativo.obs || "-"}</td>
-                                <td>
-                                    <div style="display: flex; gap: 15px;">
-                                        <button class="btn-icon btn-editar" title="Editar" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #30933C; display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa-solid fa-pen-to-square" style="font-size: 1.1rem;"></i> <span>Editar</span>
-                                        </button>
-                                        <button class="btn-icon btn-historico" title="Histórico" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #333; display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.1rem;"></i> <span>Histórico</span>
-                                        </button>
-                                    </div>
-                                </td>
-                        `;
+                    <td>${ativo.patrimonio}</td>
+                    <td>${tipoTexto}</td>
+                    <td>${ativo.marca_modelo || '-'}</td>
+                    <td><span class="badge ${obterClasseStatus(ativo.id_status)}">${statusTexto}</span></td>
+                    <td>${localTexto}</td>
+                    <td>${respTexto}</td>
+                    <td>${ativo.obs || "-"}</td>
+                    <td>
+                        <div style="display: flex; gap: 15px;">
+                            <button class="btn-icon btn-editar" title="Editar" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #30933C; display: flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid fa-pen-to-square" style="font-size: 1.1rem;"></i> <span>Editar</span>
+                            </button>
+                            <button class="btn-icon btn-historico" title="Histórico" data-patrimonio="${ativo.patrimonio}" style="background:none; border:none; cursor:pointer; color: #333; display: flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.1rem;"></i> <span>Histórico</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
                         tbody.appendChild(tr);
                     }
 
-                    // Adicionar listeners para os botões dinâmicos
+                    // --- LÓGICA DO BOTÃO EDITAR ---
                     document.querySelectorAll('.btn-editar').forEach(btn => {
                         btn.addEventListener('click', function () {
-                            alert('Editar: ' + this.getAttribute('data-patrimonio'));
+                            const patrimonio = this.getAttribute('data-patrimonio');
+                            const ativo = todosAtivos.find(a => a.patrimonio === patrimonio);
+
+                            if (ativo && typeof ModalAtivo !== 'undefined') {
+                                ModalAtivo.abrirParaEdicao(ativo);
+                            } else if (ativo) {
+                                // Fallback caso ModalAtivo não esteja pronto (improvável)
+                                console.error("ModalAtivo não definido.");
+                            }
                         });
                     });
+
+                    // --- LÓGICA DO BOTÃO HISTÓRICO  ---
                     document.querySelectorAll('.btn-historico').forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            alert('Histórico: ' + this.getAttribute('data-patrimonio'));
+                        btn.addEventListener('click', async function () {
+                            const patrimonio = this.getAttribute('data-patrimonio');
+                            const ativo = todosAtivos.find(a => a.patrimonio === patrimonio);
+                            const modalHist = document.getElementById('modalHistorico');
+                            const tbody = document.getElementById('tbodyHistorico');
+
+                            if (ativo && modalHist) {
+                                modalHist.style.display = 'flex';
+                                if (document.getElementById('tituloHistorico')) {
+                                    document.getElementById('tituloHistorico').innerText = `Ativo: ${patrimonio}`;
+                                }
+                                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Carregando...</td></tr>';
+
+                                try {
+                                    const res = await fetch(`/ativos/${ativo.id}/historico`);
+                                    const historico = await res.json();
+                                    tbody.innerHTML = "";
+
+                                    if (historico.length === 0) {
+                                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Nenhuma movimentação.</td></tr>';
+                                    } else {
+                                        historico.forEach(h => {
+                                            // Formatação da Data com Hora
+                                            const data = new Date(h.data_movimentacao).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
+
+                                            // Construção das Alterações (Antiga coluna "Ação")
+                                            let alteracoes = [];
+
+                                            if (h.status_anterior_nome && h.status_novo_nome && h.status_anterior_nome !== h.status_novo_nome) {
+                                                alteracoes.push(`<div><strong>Status:</strong> ${h.status_anterior_nome} &rarr; <span style="color:var(--ifg-green)">${h.status_novo_nome}</span></div>`);
+                                            }
+
+                                            if (h.localizacao_anterior_nome && h.localizacao_novo_nome && h.localizacao_anterior_nome !== h.localizacao_novo_nome) {
+                                                alteracoes.push(`<div><strong>Local:</strong> ${h.localizacao_anterior_nome} &rarr; <span style="color:var(--ifg-green)">${h.localizacao_novo_nome}</span></div>`);
+                                            }
+
+                                            if (h.responsavel_anterior_nome && h.responsavel_novo_nome && h.responsavel_anterior_nome !== h.responsavel_novo_nome) {
+                                                alteracoes.push(`<div><strong>Resp:</strong> ${h.responsavel_anterior_nome} &rarr; <span style="color:var(--ifg-green)">${h.responsavel_novo_nome}</span></div>`);
+                                            }
+
+                                            // Exibir Valor de Manutenção se existir
+                                            if (h.valor_manutencao) {
+                                                const valorFormatado = parseFloat(h.valor_manutencao).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                                alteracoes.push(`<div style="margin-top:4px"><span class="badge badge-warning"><i class="fa-solid fa-wrench"></i> Custo: ${valorFormatado}</span></div>`);
+                                            }
+
+                                            // Fallback se for cadastro ou primeira importação
+                                            if (alteracoes.length === 0) {
+                                                if (h.tipo_acao === 'Cadastro') alteracoes.push('<span class="badge badge-success">Cadastro Inicial</span>');
+                                                else alteracoes.push('-');
+                                            }
+
+                                            // Observação (Antiga coluna Detalhes)
+                                            const observacao = h.observacao || '-';
+
+                                            tbody.innerHTML += `
+                                        <tr style="border-bottom: 1px solid #eee;">
+                                            <td style="padding: 10px; font-size: 0.9em; color:#555;">${data}</td>
+                                            <td style="padding: 10px; font-size: 0.9em;">${alteracoes.join('')}</td>
+                                            <td style="padding: 10px; font-size: 0.9em;">${observacao}</td>
+                                            <td style="padding: 10px;">${h.responsavel || '-'}</td>
+                                        </tr>`;
+                                        });
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                    tbody.innerHTML = '<tr><td colspan="4" style="color:red; text-align:center;">Erro ao carregar.</td></tr>';
+                                }
+                            }
                         });
                     });
                 }
-
                 atualizarBotoesPaginacao();
             }
 
@@ -821,9 +901,7 @@
 
             function atualizarBotoesPaginacao() {
                 const totalPaginas = Math.ceil(ativosFiltrados.length / itensPorPagina);
-
                 document.getElementById('infoPaginacao').innerText = `Página ${paginaAtual} de ${totalPaginas || 1}`;
-
                 document.getElementById('btnAnterior').disabled = (paginaAtual === 1);
                 document.getElementById('btnProximo').disabled = (paginaAtual >= totalPaginas || totalPaginas === 0);
             }
@@ -844,7 +922,10 @@
             }
         });
     </script>
+
     <script src="js/modal-ativo.js"></script>
+
+
 </body>
 
 </html>

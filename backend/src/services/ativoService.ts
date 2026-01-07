@@ -50,7 +50,8 @@ export async function atualizarAtivo(id: number, dadosNovos: Ativo) {
         localizacao_novo: dadosNovos.id_localizacao,
         responsavel_anterior: ativoAntigo.id_responsavel,
         responsavel_novo: dadosNovos.id_responsavel,
-        observacao: dadosNovos.obs || 'Edição de cadastro'
+        observacao: dadosNovos.obs || 'Edição de cadastro',
+        valor_manutencao: dadosNovos.valor_manutencao
     });
 
     // atualizar o cadastro principal
@@ -87,4 +88,8 @@ export async function listarLocalizacoes() {
 
 export async function listarTiposAtivo() {
     return await ativoRepo.buscarTiposAtivo();
+}
+
+export async function obterHistorico(id: number) {
+    return await ativoRepo.buscarHistoricoPorAtivoId(id);
 }
