@@ -21,7 +21,8 @@ export async function cadastrarAtivo(dados: Ativo) {
             localizacao_novo: novoAtivo.id_localizacao,
             responsavel_anterior: null,
             responsavel_novo: novoAtivo.id_responsavel,
-            observacao: 'Cadastro inicial'
+            observacao: 'Cadastro inicial',
+            valor_manutencao: dados.valor_manutencao
         });
     }
 
