@@ -25,7 +25,7 @@ const ModalAtivo = {
 
                     <div class="form-group">
                         <label>Tipo de Ativo</label>
-                        <select id="tipo_ativo">
+                        <select id="tipo_ativo" required>
                             <option value="">Carregando...</option>
                         </select>
                     </div>
@@ -37,26 +37,26 @@ const ModalAtivo = {
 
                     <div class="form-group">
                         <label>Status</label>
-                        <select id="status">
+                        <select id="status" required>
                             <option value="">Carregando...</option>
                         </select>
                     </div>
 
                     <div class="form-group" id="grpValorManutencao" style="display: none;">
                         <label>Valor da Manutenção (R$)</label>
-                        <input type="number" id="valor_manutencao" step="0.01" min="0" placeholder="0,00">
+                        <input type="text" id="valor_manutencao" placeholder="R$ 0,00">
                     </div>
 
                     <div class="form-group">
                         <label>Localização</label>
-                        <select id="localizacao">
+                        <select id="localizacao" required>
                             <option value="">Carregando...</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Responsável</label>
-                        <select id="responsavel">
+                        <select id="responsavel" required>
                             <option value="">Carregando...</option>
                         </select>
                     </div>
@@ -73,6 +73,79 @@ const ModalAtivo = {
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Estilos específicos do modal
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #modalCadastro .modal-box {
+                position: relative;
+                overflow: hidden; /* Para conter os elementos decorativos */
+                border-top: none; /* Caso tenha borda anterior */
+            }
+
+            /* Faixa Degradê Superior (Padrão Dashboard/Login) */
+            #modalCadastro .modal-box::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--ifg-green), var(--ifg-red));
+                z-index: 10;
+            }
+
+            /* Detalhe Vermelho Canto Superior Direito */
+            #modalCadastro .modal-box::after {
+                content: '';
+                position: absolute;
+                top: -60px;
+                right: -60px;
+                width: 150px;
+                height: 150px;
+                background-color: var(--ifg-red);
+                border-radius: 50%;
+                opacity: 0.1; /* Leve transparência para não brigar com o conteúdo */
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            #modalCadastro h2 {
+                text-align: center;
+                color: var(--ifg-green);
+                margin-top: 15px;
+                margin-bottom: 30px;
+                font-family: var(--font-heading);
+                font-weight: 700;
+                position: relative;
+                z-index: 1; /* Ficar acima da bola vermelha */
+            }
+
+            /* Aumentar botão de fechar (Solicitação do usuário) */
+            /* Ajuste do botão de fechar (Centralizado e Flex) */
+            .close-btn {
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 24px;
+                cursor: pointer;
+                color: #64748b;
+                transition: all 0.2s;
+                border-radius: 50%;
+                line-height: 1;
+                z-index: 20;
+            }
+            .close-btn:hover {
+                color: var(--ifg-red);
+                background-color: rgba(234, 54, 54, 0.1);
+            }
+        `;
+        document.head.appendChild(style);
     },
 
     // Inicializa os eventos e carrega as opções
@@ -105,38 +178,40 @@ const ModalAtivo = {
                 this.resetForm();
             });
         }
-
-        // Fechar ao clicar fora
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                this.resetForm();
-            }
-        });
-
         // Submissão do formulário
         if (form) {
             form.addEventListener('submit', (e) => this.salvarAtivo(e));
         }
-
         // Monitorar mudança de status para exibir campo de manutenção
         const statusSelect = document.getElementById('status');
         if (statusSelect) {
             statusSelect.addEventListener('change', () => this.verificarStatusManutencao());
         }
+
+        // Máscara de moeda
+        const valorInput = document.getElementById('valor_manutencao');
+        if (valorInput) {
+            valorInput.addEventListener('input', (e) => {
+                let value = e.target.value;
+                value = value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+                value = (parseInt(value) / 100).toFixed(2) + ""; // Divide por 100 e fixa 2 casas
+                value = value.replace(".", ","); // Troca ponto por vírgula
+                value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); // Adiciona pontos de milhar
+                if (value === 'NaN' || value === 'undefined') {
+                    e.target.value = "";
+                    return;
+                }
+                e.target.value = "R$ " + value;
+            });
+        }
     },
 
     verificarStatusManutencao: function () {
-        if (!this.editingId) return; // Só aplica na edição
-
-        // Pega o status original (armazenado quando abriu o modal)
-        const statusOriginal = this.statusOriginal;
         const novoStatus = parseInt(document.getElementById('status').value);
         const divManutencao = document.getElementById('grpValorManutencao');
 
-        // Lógica: Se estava em Manutenção (14) e mudou para Em Uso (15)
-        // OBS: Estou assumindo IDs fixos baseados no código anterior (14 warning, 15 success)
-        if (statusOriginal == 14 && novoStatus == 15) {
+        // Lógica: Aparecer sempre que o status selecionado for "Em Manutenção" (14)
+        if (novoStatus === 14) {
             divManutencao.style.display = 'block';
             document.getElementById('valor_manutencao').required = true;
         } else {
@@ -168,8 +243,6 @@ const ModalAtivo = {
         // Preenche campos
         if (document.getElementById('patrimonio')) {
             document.getElementById('patrimonio').value = ativo.patrimonio;
-            // Opcional: Desabilitar edição de patrimônio se for regra de negócio
-            // document.getElementById('patrimonio').disabled = true; 
         }
         if (document.getElementById('tipo_ativo')) document.getElementById('tipo_ativo').value = ativo.id_tipo_ativo || "";
         if (document.getElementById('marca_modelo')) document.getElementById('marca_modelo').value = ativo.marca_modelo;
@@ -178,13 +251,22 @@ const ModalAtivo = {
         if (document.getElementById('responsavel')) document.getElementById('responsavel').value = ativo.id_responsavel || "";
         if (document.getElementById('observacoes')) document.getElementById('observacoes').value = ativo.obs;
 
+        // Formatar valor da manutenção se existir
+        if (document.getElementById('valor_manutencao') && ativo.valor_manutencao) {
+            const valor = parseFloat(ativo.valor_manutencao).toFixed(2).replace('.', ',');
+            document.getElementById('valor_manutencao').value = `R$ ${valor}`;
+        }
+
         // Atualiza Título
         const title = document.getElementById('modalTitle');
         if (title) title.innerText = `Editar Ativo: ${ativo.patrimonio}`;
 
         // Abre modal
         const modal = document.getElementById('modalCadastro');
-        if (modal) modal.style.display = 'flex';
+        if (modal) {
+            modal.style.display = 'flex';
+            this.verificarStatusManutencao(); // Garante que campos condicionais apareçam
+        }
     },
 
     carregarOpcoes: async function () {
@@ -211,7 +293,7 @@ const ModalAtivo = {
         const select = document.getElementById(elementId);
         if (!select) return;
 
-        select.innerHTML = ''; // Limpa opções "Carregando..."
+        select.innerHTML = '<option value="" disabled selected>Selecione</option>';
 
         data.forEach(item => {
             const opt = document.createElement('option');
@@ -247,7 +329,7 @@ const ModalAtivo = {
             id_localizacao: parseInt(document.getElementById('localizacao').value),
             id_responsavel: parseInt(document.getElementById('responsavel').value),
             obs: document.getElementById('observacoes').value,
-            valor_manutencao: document.getElementById('valor_manutencao').value ? parseFloat(document.getElementById('valor_manutencao').value) : null
+            valor_manutencao: this.parseValorManutencao(document.getElementById('valor_manutencao').value)
         };
 
         const isEdicao = !!this.editingId;
@@ -290,6 +372,14 @@ const ModalAtivo = {
             console.error('Erro:', error);
             this.mostrarMensagem('msgCadastro', 'Erro de conexão.', true);
         }
+    },
+
+    parseValorManutencao: function (valorString) {
+        if (!valorString) return null;
+        // Remove "R$", pontos e espaços. Troca vírgula por ponto.
+        const limpo = valorString.replace(/[R$\s.]/g, '').replace(',', '.');
+        const numero = parseFloat(limpo);
+        return isNaN(numero) ? null : numero;
     }
 };
 
