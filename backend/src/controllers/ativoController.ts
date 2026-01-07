@@ -84,3 +84,14 @@ export async function listarTiposAtivo(req: Request, res: Response) {
         res.status(500).json({ message: 'Erro ao buscar tipos de ativo' });
     }
 }
+
+export async function listarHistorico(req: Request, res: Response) {
+    try {
+        const id = parseInt(req.params.id);
+        const historico = await ativoService.obterHistorico(id);
+        res.status(200).json(historico);
+    } catch (error) {
+        console.error('Erro ao listar histórico:', error);
+        res.status(500).json({ message: 'Erro ao buscar histórico' });
+    }
+}
