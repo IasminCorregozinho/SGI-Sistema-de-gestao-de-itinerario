@@ -12,6 +12,9 @@ router.put('/:id', ativoController.editar);
 router.get('/', ativoController.listar);
 router.get('/dashboard-kpis', ativoController.obterDadosDashboard);
 router.get('/movimentacoes-recentes', ativoController.obterMovimentacoes);
+router.get('/status', ativoController.listarStatus);
+router.get('/localizacoes', ativoController.listarLocalizacoes);
+router.get('/tipos', ativoController.listarTiposAtivo);
 
 export default router;
 
