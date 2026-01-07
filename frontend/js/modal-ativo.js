@@ -1,6 +1,7 @@
 
 // modal-ativo.js
 const ModalAtivo = {
+    editingId: null, // Armazena o ID do ativo sendo editado
 
     // Injeta o HTML do modal no corpo da página
     injectModal: function () {
@@ -10,7 +11,7 @@ const ModalAtivo = {
         <div id="modalCadastro" class="modal-overlay">
             <div class="modal-box">
                 <span class="close-btn" id="fecharModalCadastro">&times;</span>
-                <h2>Cadastrar Novo Ativo</h2>
+                <h2 id="modalTitle">Cadastrar Novo Ativo</h2>
 
                 <div id="msgCadastro"
                     style="display: none; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
@@ -39,6 +40,11 @@ const ModalAtivo = {
                         <select id="status">
                             <option value="">Carregando...</option>
                         </select>
+                    </div>
+
+                    <div class="form-group" id="grpValorManutencao" style="display: none;">
+                        <label>Valor da Manutenção (R$)</label>
+                        <input type="number" id="valor_manutencao" step="0.01" min="0" placeholder="0,00">
                     </div>
 
                     <div class="form-group">
@@ -87,6 +93,7 @@ const ModalAtivo = {
         openBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                this.resetForm(); // Garante formulário limpo ao abrir novo
                 modal.style.display = 'flex';
             });
         });
@@ -111,11 +118,73 @@ const ModalAtivo = {
         if (form) {
             form.addEventListener('submit', (e) => this.salvarAtivo(e));
         }
+
+        // Monitorar mudança de status para exibir campo de manutenção
+        const statusSelect = document.getElementById('status');
+        if (statusSelect) {
+            statusSelect.addEventListener('change', () => this.verificarStatusManutencao());
+        }
+    },
+
+    verificarStatusManutencao: function () {
+        if (!this.editingId) return; // Só aplica na edição
+
+        // Pega o status original (armazenado quando abriu o modal)
+        const statusOriginal = this.statusOriginal;
+        const novoStatus = parseInt(document.getElementById('status').value);
+        const divManutencao = document.getElementById('grpValorManutencao');
+
+        // Lógica: Se estava em Manutenção (14) e mudou para Em Uso (15)
+        // OBS: Estou assumindo IDs fixos baseados no código anterior (14 warning, 15 success)
+        if (statusOriginal == 14 && novoStatus == 15) {
+            divManutencao.style.display = 'block';
+            document.getElementById('valor_manutencao').required = true;
+        } else {
+            divManutencao.style.display = 'none';
+            document.getElementById('valor_manutencao').value = '';
+            document.getElementById('valor_manutencao').required = false;
+        }
     },
 
     resetForm: function () {
+        this.editingId = null;
         document.getElementById('formAtivo').reset();
         document.getElementById('msgCadastro').style.display = 'none';
+        const title = document.getElementById('modalTitle');
+        if (title) title.innerText = "Cadastrar Novo Ativo";
+
+        // Habilita campo patrimônio caso esteja desabilitado
+        const patInput = document.getElementById('patrimonio');
+        if (patInput) patInput.disabled = false;
+    },
+
+    // Função auxiliar para abrir o modal em modo de edição
+    abrirParaEdicao: function (ativo) {
+        if (!ativo) return;
+
+        this.editingId = ativo.id;
+        this.statusOriginal = ativo.id_status; // Guarda o status original
+
+        // Preenche campos
+        if (document.getElementById('patrimonio')) {
+            document.getElementById('patrimonio').value = ativo.patrimonio;
+            // Opcional: Desabilitar edição de patrimônio se for regra de negócio
+            // document.getElementById('patrimonio').disabled = true; 
+        }
+        if (document.getElementById('tipo_ativo')) document.getElementById('tipo_ativo').value = ativo.id_tipo_ativo || "";
+        if (document.getElementById('marca_modelo')) document.getElementById('marca_modelo').value = ativo.marca_modelo;
+        if (document.getElementById('status')) document.getElementById('status').value = ativo.id_status || "";
+        if (document.getElementById('localizacao')) document.getElementById('localizacao').value = ativo.id_localizacao || "";
+        if (document.getElementById('responsavel')) document.getElementById('responsavel').value = ativo.id_responsavel || "";
+        if (document.getElementById('observacoes')) document.getElementById('observacoes').value = ativo.obs;
+
+        // Atualiza Título
+        const title = document.getElementById('modalTitle');
+        if (title) title.innerText = `Editar Ativo: ${ativo.patrimonio}`;
+
+        // Abre modal
+        const modal = document.getElementById('modalCadastro');
+        if (modal) modal.style.display = 'flex';
     },
 
     carregarOpcoes: async function () {
@@ -177,18 +246,24 @@ const ModalAtivo = {
             id_status: parseInt(document.getElementById('status').value),
             id_localizacao: parseInt(document.getElementById('localizacao').value),
             id_responsavel: parseInt(document.getElementById('responsavel').value),
-            obs: document.getElementById('observacoes').value
+            obs: document.getElementById('observacoes').value,
+            valor_manutencao: document.getElementById('valor_manutencao').value ? parseFloat(document.getElementById('valor_manutencao').value) : null
         };
 
+        const isEdicao = !!this.editingId;
+        const url = isEdicao ? `/ativos/${this.editingId}` : '/ativos';
+        const method = isEdicao ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch('/ativos', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosAtivo)
             });
 
             if (response.ok) {
-                this.mostrarMensagem('msgCadastro', 'Ativo cadastrado com sucesso!', false);
+                const msgSucesso = isEdicao ? 'Ativo atualizado com sucesso!' : 'Ativo cadastrado com sucesso!';
+                this.mostrarMensagem('msgCadastro', msgSucesso, false);
                 setTimeout(() => {
                     document.getElementById('modalCadastro').style.display = 'none';
                     this.resetForm();
@@ -199,7 +274,7 @@ const ModalAtivo = {
                         // Mostra mensagem global se existir
                         const msgGlobal = document.getElementById('divMensagemSistema');
                         if (msgGlobal) {
-                            msgGlobal.textContent = 'Ativo cadastrado com sucesso!';
+                            msgGlobal.textContent = msgSucesso;
                             msgGlobal.style.display = 'block';
                             msgGlobal.style.backgroundColor = '#d1fae5';
                             msgGlobal.style.color = '#065f46';
