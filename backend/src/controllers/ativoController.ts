@@ -54,3 +54,33 @@ export async function obterMovimentacoes(req: Request, res: Response) {
         res.status(500).json({ message: 'Erro interno ao buscar histórico' });
     }
 }
+
+export async function listarStatus(req: Request, res: Response) {
+    try {
+        const statuses = await ativoService.listarStatus();
+        res.status(200).json(statuses);
+    } catch (error) {
+        console.error('Erro ao listar status:', error);
+        res.status(500).json({ message: 'Erro ao buscar status' });
+    }
+}
+
+export async function listarLocalizacoes(req: Request, res: Response) {
+    try {
+        const locais = await ativoService.listarLocalizacoes();
+        res.status(200).json(locais);
+    } catch (error) {
+        console.error('Erro ao listar localizações:', error);
+        res.status(500).json({ message: 'Erro ao buscar localizações' });
+    }
+}
+
+export async function listarTiposAtivo(req: Request, res: Response) {
+    try {
+        const tipos = await ativoService.listarTiposAtivo();
+        res.status(200).json(tipos);
+    } catch (error) {
+        console.error('Erro ao listar tipos de ativo:', error);
+        res.status(500).json({ message: 'Erro ao buscar tipos de ativo' });
+    }
+}
