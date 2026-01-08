@@ -231,6 +231,37 @@ const ModalAtivo = {
         // Habilita campo patrimônio caso esteja desabilitado
         const patInput = document.getElementById('patrimonio');
         if (patInput) patInput.disabled = false;
+
+        this.configurarCampoResponsavel();
+    },
+
+    // Configura o campo 'Responsável' com base no perfil do usuário logado
+    configurarCampoResponsavel: function () {
+        const respSelect = document.getElementById('responsavel');
+        if (!respSelect) return;
+
+        const usuarioLogado = localStorage.getItem('usuario');
+        if (usuarioLogado) {
+            try {
+                const u = JSON.parse(usuarioLogado);
+                const perfilId = u.perfil_id;
+                const meuResponsavelId = u.id || u.responsavel_id;
+
+                // Perfil 2 = Coordenação/Administrador
+                // Se NÃO for perfil 2, trava o select e seleciona o próprio usuário
+                if (perfilId !== 2) {
+                    respSelect.value = meuResponsavelId;
+                    respSelect.disabled = true;
+
+                    // Adiciona um input hidden para garantir que o valor seja enviado no submit (se necessario)
+                    // Mas como estamos pegando via .value do elemento disabled, o JS pega normal.
+                } else {
+                    respSelect.disabled = false;
+                }
+            } catch (e) {
+                console.error("Erro ao configurar responsável", e);
+            }
+        }
     },
 
     // Função auxiliar para abrir o modal em modo de edição
@@ -238,7 +269,17 @@ const ModalAtivo = {
         if (!ativo) return;
 
         this.editingId = ativo.id;
-        this.statusOriginal = ativo.id_status; // Guarda o status original
+        // Armazenar os dados originais para comparação (snapshot)
+        this.dadosOriginais = {
+            patrimonio: ativo.patrimonio,
+            id_tipo_ativo: ativo.id_tipo_ativo,
+            marca_modelo: ativo.marca_modelo,
+            id_status: ativo.id_status,
+            id_localizacao: ativo.id_localizacao,
+            id_responsavel: ativo.id_responsavel,
+            obs: ativo.obs,
+            valor_manutencao: ativo.valor_manutencao ? parseFloat(ativo.valor_manutencao) : null
+        };
 
         // Preenche campos
         if (document.getElementById('patrimonio')) {
@@ -255,6 +296,8 @@ const ModalAtivo = {
         if (document.getElementById('valor_manutencao') && ativo.valor_manutencao) {
             const valor = parseFloat(ativo.valor_manutencao).toFixed(2).replace('.', ',');
             document.getElementById('valor_manutencao').value = `R$ ${valor}`;
+        } else {
+            if (document.getElementById('valor_manutencao')) document.getElementById('valor_manutencao').value = "";
         }
 
         // Atualiza Título
@@ -266,6 +309,7 @@ const ModalAtivo = {
         if (modal) {
             modal.style.display = 'flex';
             this.verificarStatusManutencao(); // Garante que campos condicionais apareçam
+            this.configurarCampoResponsavel(); // Aplica regra de perfil
         }
     },
 
@@ -301,6 +345,11 @@ const ModalAtivo = {
             opt.textContent = item[textKey];
             select.appendChild(opt);
         });
+
+        // Se for o campo de responsável, re-aplica a regra de perfil pq o select foi recarregado
+        if (elementId === 'responsavel') {
+            this.configurarCampoResponsavel();
+        }
     },
 
     mostrarMensagem: function (divId, texto, isErro) {
@@ -321,7 +370,7 @@ const ModalAtivo = {
     salvarAtivo: async function (event) {
         event.preventDefault();
 
-        const dadosAtivo = {
+        const dadosFormulario = {
             patrimonio: document.getElementById('patrimonio').value,
             id_tipo_ativo: parseInt(document.getElementById('tipo_ativo').value),
             marca_modelo: document.getElementById('marca_modelo').value,
@@ -333,14 +382,66 @@ const ModalAtivo = {
         };
 
         const isEdicao = !!this.editingId;
-        const url = isEdicao ? `/ativos/${this.editingId}` : '/ativos';
-        const method = isEdicao ? 'PUT' : 'POST';
+        let url = '/ativos';
+        let method = 'POST';
+        let body = dadosFormulario;
+
+        if (isEdicao) {
+            url = `/ativos/${this.editingId}`;
+            method = 'PATCH';
+
+            // Calcula apenas os campos alterados
+            const dadosAlterados = {};
+            let houveAlteracao = false;
+
+            for (const key in dadosFormulario) {
+                let valorOriginal = this.dadosOriginais[key];
+                let valorNovo = dadosFormulario[key];
+
+                // Normalização para comparação (null vs undefined vs vazio)
+                if (valorOriginal === undefined) valorOriginal = null;
+                if (valorNovo === undefined) valorNovo = null;
+                // Para strings, considere vazio igual a null se preferir, ou apenas se ambos forem falsy
+
+                // Comparação estrita
+                if (valorNovo !== valorOriginal) {
+                    // Evita falso positivo entre null e "" para campos de texto, se desejado.
+                    // Mas vamos assumir que se mudou, mudou.
+                    // Exceção: Se original é null e novo é "", ou vice-versa, e isso não importa?
+                    // Para integridade, melhor enviar. 
+
+                    dadosAlterados[key] = valorNovo;
+                    houveAlteracao = true;
+                }
+            }
+
+            if (!houveAlteracao) {
+                this.mostrarMensagem('msgCadastro', 'Nenhuma alteração realizada.', false);
+                return;
+            }
+            body = dadosAlterados;
+        }
+
+        // Recupera o ID do usuário logado
+        const usuarioLogado = localStorage.getItem('usuario');
+        let usuarioId = 1; // Fallback temporário
+        if (usuarioLogado) {
+            try {
+                const u = JSON.parse(usuarioLogado);
+                usuarioId = u.id || u.responsavel_id || 1;
+            } catch (e) {
+                console.error("Erro ao ler usuário logado", e);
+            }
+        }
 
         try {
             const response = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dadosAtivo)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': usuarioId.toString()
+                },
+                body: JSON.stringify(body)
             });
 
             if (response.ok) {

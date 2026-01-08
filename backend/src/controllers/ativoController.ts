@@ -1,23 +1,39 @@
+// Ativo Controller
+// * * Este arquivo é responsável por gerenciar as requisições HTTP relacionadas aos Ativos de TI.
+// * Ele atua como uma ponte entre o Frontend (Cliente) e a Camada de Serviço (Regra de Negócio).
+
 import { Request, Response } from 'express';
 import * as ativoService from '../services/ativoService';
 
+// function criar: cria um novo ativo no sistema, recebe os dados do corpo da requisição (JSON), 
+// chama o serviço de cadastro e retorna o ativo criado com status 201 (Created).
+
 export async function criar(req: Request, res: Response) {
     try {
-        const resultado = await ativoService.cadastrarAtivo(req.body);
+        const usuarioId = parseInt(req.headers['x-user-id'] as string) || 1;
+        // Envia os dados crus do formulário (req.body) para a regra de negócio.
+        const resultado = await ativoService.cadastrarAtivo(req.body, usuarioId);
+        // Retorna sucesso e o objeto criado
         return res.status(201).json(resultado);
     } catch (error: any) {
+        // Retorna erro 500 em caso de falha no servidor ou validação
         console.error('Erro ao criar ativo:', error);
         return res.status(500).json({ error: error.message });
     }
 }
 
+// function editar: atualiza os dados de um ativo existente
+// Busca o ativo pelo ID passado na URL e atualiza com os dados do corpo da requisição.
 export async function editar(req: Request, res: Response) {
     try {
         const id = parseInt(req.params.id);
-        const resultado = await ativoService.atualizarAtivo(id, req.body);
+        const usuarioId = parseInt(req.headers['x-user-id'] as string) || 1;
+        // Chama o serviço para atualizar o registro no banco
+        const resultado = await ativoService.atualizarAtivo(id, req.body, usuarioId);
         return res.status(200).json(resultado);
     } catch (error: any) {
         console.error('Erro ao editar ativo:', error);
+        // Tratamento específico: Se o ativo não existir, retorna 404 (Not Found)
         if (error.message === 'Ativo não encontrado') {
             return res.status(404).json({ error: error.message });
         }
@@ -25,9 +41,13 @@ export async function editar(req: Request, res: Response) {
     }
 }
 
+// function listar: lista todos os ativos cadastrados no sistema.
+// Utilizado para popular a tabela principal de listagem.
 export async function listar(req: Request, res: Response) {
     try {
+        // Busca a lista completa via serviço
         const ativos = await ativoService.listarAtivos();
+        // Retorna a lista (array JSON)
         return res.status(200).json(ativos);
     } catch (error: any) {
         console.error('Erro ao listar ativo:', error);
@@ -35,6 +55,7 @@ export async function listar(req: Request, res: Response) {
     }
 }
 
+// function obterDadosDashboard: obtém os dados consolidados para a visualização do dashboard (KPIs e Gráficos).
 export async function obterDadosDashboard(req: Request, res: Response) {
     try {
         const dados = await ativoService.obterDadosDashboard();
@@ -44,6 +65,8 @@ export async function obterDadosDashboard(req: Request, res: Response) {
         res.status(500).json({ message: 'Erro ao buscar dados do dashboard' });
     }
 }
+// function obterMovimentacoes: obtém as movimentações recentes dos ativos.
+// Mostra as últimas ações realizadas no sistema (quem fez o que e quando).
 
 export async function obterMovimentacoes(req: Request, res: Response) {
     try {
@@ -55,6 +78,9 @@ export async function obterMovimentacoes(req: Request, res: Response) {
     }
 }
 
+// function listarStatus:Lista todas as opções de Status disponíveis no banco.
+// é usado para preencher os Selecione... (dropdowns) no formulário de cadastro, filtro e edição
+
 export async function listarStatus(req: Request, res: Response) {
     try {
         const statuses = await ativoService.listarStatus();
@@ -65,6 +91,8 @@ export async function listarStatus(req: Request, res: Response) {
     }
 }
 
+// function listarLocalizacoes: Lista todas as opções de Localizações disponíveis no banco.
+// é usado para preencher os Selecione... (dropdowns) no formulário de cadastro, filtro e edição
 export async function listarLocalizacoes(req: Request, res: Response) {
     try {
         const locais = await ativoService.listarLocalizacoes();
@@ -75,6 +103,8 @@ export async function listarLocalizacoes(req: Request, res: Response) {
     }
 }
 
+// function listarTiposAtivo: Lista todos os tipo de ativos cadastrados no banco.
+// é usado para preencher os Selecione... (dropdowns) no formulário de cadastro, filtro e edição
 export async function listarTiposAtivo(req: Request, res: Response) {
     try {
         const tipos = await ativoService.listarTiposAtivo();
@@ -85,6 +115,8 @@ export async function listarTiposAtivo(req: Request, res: Response) {
     }
 }
 
+// function listarHistorico: Obtém o histórico específico de UM ativo.
+// Recebe o ID do ativo na URL e retorna todas as alterações daquele item.
 export async function listarHistorico(req: Request, res: Response) {
     try {
         const id = parseInt(req.params.id);

@@ -571,6 +571,9 @@
                     <p>Gerencie e consulte todos os ativos cadastrados</p>
                 </div>
                 <div class="actions">
+                    <button id="btnExportar" class="btn-primary" style="background-color: var(--ifg-green-dark);">
+                        <i class="fa-solid fa-file-csv"></i> Baixar Relatório
+                    </button>
                     <a href="dashboard.html" class="btn-primary">
                         <i class="fa-solid fa-house"></i> Dashboard
                     </a>
@@ -612,6 +615,7 @@
                             <!-- Options carregadas via JS -->
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Marca/Modelo</label>
                         <input type="text" id="filtro_marca" placeholder="Buscar...">
@@ -699,6 +703,9 @@
             // Paginação
             document.getElementById('btnAnterior').addEventListener('click', paginaAnterior);
             document.getElementById('btnProximo').addEventListener('click', proximaPagina);
+
+            // Exportar CSV
+            document.getElementById('btnExportar').addEventListener('click', exportarCSV);
 
             // Fechar modal de histórico (Correção: verifica se o elemento existe antes de adicionar evento)
             const btnFecharHist = document.getElementById('fecharModalHistorico');
@@ -1003,6 +1010,43 @@
                     paginaAtual++;
                     atualizarTabela();
                 }
+            }
+
+            function exportarCSV() {
+                if (!todosAtivos || todosAtivos.length === 0) {
+                    mostrarMensagem('divMensagemSistema', "Não há dados para exportar.", true);
+                    return;
+                }
+
+                // Cabeçalho do CSV
+                const headers = ["Patrimonio", "Tipo", "Marca/Modelo", "Status", "Localizacao", "Responsavel", "Observacao", "Valor Manutencao"];
+
+                // Mapeia os dados para linhas do CSV
+                const rows = todosAtivos.map(ativo => {
+                    return [
+                        ativo.patrimonio,
+                        ativo.tipo_ativo_nome,
+                        ativo.marca_modelo,
+                        ativo.status_nome,
+                        ativo.localizacao_nome,
+                        ativo.responsavel_nome,
+                        ativo.obs ? ativo.obs.replace(/(\r\n|\n|\r)/gm, " ") : "", // Remove quebras de linha
+                        ativo.valor_manutencao ? parseFloat(ativo.valor_manutencao).toFixed(2).replace('.', ',') : ""
+                    ].map(field => `"${field || ''}"`).join(";"); // Aspas em tudo e separador ; (padrão Brasil/Excel)
+                });
+
+                // Une cabeçalho e linhas
+                const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\n"); // BOM para UTF-8 no Excel
+
+                // Cria o blob e o link para download
+                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", "relatorio_ativos_sgi.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         });
     </script>
