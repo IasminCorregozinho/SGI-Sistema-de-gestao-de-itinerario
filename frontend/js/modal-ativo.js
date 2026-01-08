@@ -4,6 +4,8 @@ const ModalAtivo = {
     editingId: null, // Armazena o ID do ativo sendo editado
 
     // Injeta o HTML do modal no corpo da página
+    // function injectModal: Cria dinamicamente o HTML do modal e o insere no DOM.
+    // Inclui também os estilos (CSS) específicos do modal.
     injectModal: function () {
         if (document.getElementById('modalCadastro')) return; // Evita duplicação
 
@@ -14,7 +16,7 @@ const ModalAtivo = {
                 <h2 id="modalTitle">Cadastrar Novo Ativo</h2>
 
                 <div id="msgCadastro"
-                    style="display: none; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; font-weight: 500;">
+                    style="display: none; padding: 8px 16px; margin: 10px auto; border-radius: 20px; text-align: center; font-weight: 500; width: fit-content; max-width: 90%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 </div>
 
                 <form id="formAtivo">
@@ -148,13 +150,16 @@ const ModalAtivo = {
         document.head.appendChild(style);
     },
 
-    // Inicializa os eventos e carrega as opções
+    // function init: Ponto de entrada do módulo.
+    // Injeta o modal, configura eventos e carrega as opções dos selects.
     init: function () {
         this.injectModal();
         this.setupEventListeners();
         this.carregarOpcoes();
     },
 
+    // function setupEventListeners: Configura os listeners de clique e submit.
+    // Trata fechamento, abertura e máscara de moeda.
     setupEventListeners: function () {
         const modal = document.getElementById('modalCadastro');
         const closeBtn = document.getElementById('fecharModalCadastro');
@@ -206,6 +211,7 @@ const ModalAtivo = {
         }
     },
 
+    // function verificarStatusManutencao: Mostra/Esconde campo de valor baseado no status "Em Manutenção".
     verificarStatusManutencao: function () {
         const novoStatus = parseInt(document.getElementById('status').value);
         const divManutencao = document.getElementById('grpValorManutencao');
@@ -221,6 +227,7 @@ const ModalAtivo = {
         }
     },
 
+    // function resetForm: Limpa o formulário e reseta o estado para "Novo Cadastro".
     resetForm: function () {
         this.editingId = null;
         document.getElementById('formAtivo').reset();
@@ -236,6 +243,7 @@ const ModalAtivo = {
     },
 
     // Configura o campo 'Responsável' com base no perfil do usuário logado
+    // function configurarCampoResponsavel: Trava o campo de responsável se o usuário não for Coordenação.
     configurarCampoResponsavel: function () {
         const respSelect = document.getElementById('responsavel');
         if (!respSelect) return;
@@ -265,6 +273,8 @@ const ModalAtivo = {
     },
 
     // Função auxiliar para abrir o modal em modo de edição
+    // function abrirParaEdicao: Prepara o modal para edição de um ativo existente.
+    // Preenche os campos e armazena o estado original para diff.
     abrirParaEdicao: function (ativo) {
         if (!ativo) return;
 
@@ -313,6 +323,7 @@ const ModalAtivo = {
         }
     },
 
+    // function carregarOpcoes: Busca dados auxiliares (Tipos, Status, Locais, Responsaveis) na API.
     carregarOpcoes: async function () {
         try {
             // Promise.all para carregar tudo em paralelo
@@ -333,6 +344,7 @@ const ModalAtivo = {
         }
     },
 
+    // function popularSelect: Helper para criar as options de um elemento <select>.
     popularSelect: function (elementId, data, valueKey, textKey) {
         const select = document.getElementById(elementId);
         if (!select) return;
@@ -352,6 +364,7 @@ const ModalAtivo = {
         }
     },
 
+    // function mostrarMensagem: Exibe feedback no topo do modal.
     mostrarMensagem: function (divId, texto, isErro) {
         const div = document.getElementById(divId);
         div.style.display = 'block';
@@ -367,6 +380,8 @@ const ModalAtivo = {
         }
     },
 
+    // function salvarAtivo: Lógica central de persistência (POST/PATCH).
+    // Verifica alterações (se edição) e trata resposta da API.
     salvarAtivo: async function (event) {
         event.preventDefault();
 
@@ -475,6 +490,7 @@ const ModalAtivo = {
         }
     },
 
+    // function parseValorManutencao: Converte string "R$ 1.234,56" para float 1234.56.
     parseValorManutencao: function (valorString) {
         if (!valorString) return null;
         // Remove "R$", pontos e espaços. Troca vírgula por ponto.
