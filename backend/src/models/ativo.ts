@@ -1,5 +1,12 @@
+// interface para o Ativo
+// Este arquivo define os "contratos" de dados para os Ativos e seus Históricos.
+// Ele garante que o objeto que o backend envia seja o mesmo que o frontend espera receber.
+
+// Interface Principal do Ativo: Representa a estrutura completa de um equipamento de TI no sistema.
+// É usada tanto para listagem quanto para o formulário de cadastro/edição.
+ 
 export interface Ativo {
-    id?: number;
+    id?: number; 
     patrimonio: string;
     id_tipo_ativo: number;
     id_status: number;
@@ -15,7 +22,8 @@ export interface Ativo {
     status_nome?: string;
     localizacao_nome?: string;
     responsavel_nome?: string;
-    valor_manutencao?: number; // Campo transiente para atualização
+    // Valor monetário associado, usado principalmente se houver custo de manutenção.
+    valor_manutencao?: number; 
 }
 
 // interface para o Histórico
