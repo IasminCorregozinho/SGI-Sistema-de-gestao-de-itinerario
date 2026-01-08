@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { cadastrar, autenticar, criarPerfil, removerPerfil, listarPerfis } from "../controllers/userController";
+import { cadastrar, autenticar, criarPerfil, removerPerfil, listarPerfis, atualizarPerfil } from "../controllers/userController";
 
 const router = Router();
 
@@ -11,6 +11,7 @@ router.post("/login", autenticar);
 const COORDINATION_PROFILE_ID = 2;
 
 router.post("/perfis", criarPerfil);
+router.patch("/perfis/:id", atualizarPerfil);
 router.delete("/perfis/:id", removerPerfil);
 router.get("/perfis", listarPerfis);
 

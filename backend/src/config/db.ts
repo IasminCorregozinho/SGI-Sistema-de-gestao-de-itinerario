@@ -5,9 +5,7 @@ import path from 'path';
 // Garante que o .env da raiz seja lido corretamente
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
-console.log('Tentando conectar ao banco:', {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
+console.log('[AGUARDE...] Tentando conectar ao banco:', {
     database: process.env.DB_DATABASE,
     port: process.env.DB_PORT
 });
