@@ -387,12 +387,17 @@
         </div>
     </div>
     <script>
+        // Script de Login
+        // * Gerencia a autenticação do usuário, envio do formulário e redirecionamento.
+
         document.addEventListener('DOMContentLoaded', () => {
             const formulario = document.getElementById('loginForm');
             const inputMatricula = document.getElementById('matricula');
             const inputSenha = document.getElementById('senha');
 
             if (formulario) {
+                // Event Listener: submit
+                // Intercepta o envio do formulário, previne o reload padrão e realiza a autenticação via API.
                 formulario.addEventListener('submit', async (e) => {
                     e.preventDefault();
 

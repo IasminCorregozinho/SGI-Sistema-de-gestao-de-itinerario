@@ -47,6 +47,45 @@ export async function excluirPerfil(id: number) {
   return result.rows[0];
 }
 
+// RF002: Edição de perfis (Alteração parcial)
+export async function atualizarPerfil(id: number, dados: { nome?: string; matricula?: string; senha?: string; perfil_id?: number }) {
+  const fields: string[] = [];
+  const values: any[] = [];
+  let idx = 1;
+
+  if (dados.nome !== undefined) {
+    fields.push(`nome = $${idx++}`);
+    values.push(dados.nome);
+  }
+  if (dados.matricula !== undefined) {
+    fields.push(`matricula = $${idx++}`);
+    values.push(dados.matricula);
+  }
+  if (dados.senha !== undefined) {
+    fields.push(`senha = $${idx++}`);
+    values.push(dados.senha);
+  }
+  if (dados.perfil_id !== undefined) {
+    fields.push(`perfil_id = $${idx++}`);
+    values.push(dados.perfil_id);
+  }
+
+  if (fields.length === 0) {
+    throw new Error("Nenhum dado informado para atualização.");
+  }
+
+  values.push(id);
+  const query = `UPDATE responsavel SET ${fields.join(", ")} WHERE responsavel_id = $${idx} RETURNING *`;
+
+  const result = await pool.query(query, values);
+
+  if (result.rowCount === 0) {
+    throw new Error("Perfil não encontrado");
+  }
+
+  return result.rows[0];
+}
+
 // Auxiliar: Consulta de perfis (Listagem de usuários cadastrados)
 export async function listarPerfis() {
   const result = await pool.query("SELECT * FROM responsavel ORDER BY responsavel_id ASC");
