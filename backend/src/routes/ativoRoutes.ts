@@ -8,7 +8,7 @@ const router = Router();
 const ALLOWED_PROFILES = [1, 2];
 
 router.post('/', ativoController.criar);
-router.put('/:id', ativoController.editar);
+router.patch('/:id', ativoController.editar);
 router.get('/', ativoController.listar);
 router.get('/dashboard-kpis', ativoController.obterDadosDashboard);
 router.get('/movimentacoes-recentes', ativoController.obterMovimentacoes);
