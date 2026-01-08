@@ -115,8 +115,11 @@ export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
 }
 
 // FUNÇÃO DO DASHBOARD 
+// Calcula os KPIs (Indicadores) principais para o Dashboard.
+// Retorna: Total de ativos, Total em Estoque, Total em Manutenção e Total Descartado.
 export async function obterDadosDashboard() {
 
+    // USA SUM com CASE WHEN para contar condicionalmente em um única consulta rápida
     const query = `
         SELECT 
             COUNT(*)::int as total,
