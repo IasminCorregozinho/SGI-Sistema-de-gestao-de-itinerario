@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import * as ativoController from '../controllers/ativoController';
+import { Router } from "express";
+import * as ativoController from "../controllers/ativoController";
 
 const router = Router();
 
@@ -7,15 +7,14 @@ const router = Router();
 // Perfil 1 = Suporte, 2 = Coordenação
 const ALLOWED_PROFILES = [1, 2];
 
-router.post('/', ativoController.criar);
-router.patch('/:id', ativoController.editar);
-router.get('/', ativoController.listar);
-router.get('/dashboard-kpis', ativoController.obterDadosDashboard);
-router.get('/movimentacoes-recentes', ativoController.obterMovimentacoes);
-router.get('/status', ativoController.listarStatus);
-router.get('/localizacoes', ativoController.listarLocalizacoes);
-router.get('/tipos', ativoController.listarTiposAtivo);
-router.get('/:id/historico', ativoController.listarHistorico);
+router.post("/", ativoController.criar);
+router.patch("/:id", ativoController.editar);
+router.get("/", ativoController.listar);
+router.get("/dashboard-kpis", ativoController.obterDadosDashboard);
+router.get("/movimentacoes-recentes", ativoController.obterMovimentacoes);
+router.get("/status", ativoController.listarStatus);
+router.get("/localizacoes", ativoController.listarLocalizacoes);
+router.get("/tipos", ativoController.listarTiposAtivo);
+router.get("/:id/historico", ativoController.listarHistorico);
 
 export default router;
-

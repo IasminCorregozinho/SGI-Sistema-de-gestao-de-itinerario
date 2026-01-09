@@ -47,7 +47,8 @@
     }
 
     .sidebar {
-      width: 280px;
+      width: 240px;
+      /* Reduzido de 280px para 240px */
       background-color: var(--ifg-green);
       color: var(--white);
       display: flex;
@@ -374,15 +375,62 @@
     .modal-box {
       background: var(--white);
       padding: 30px;
-      border-radius: 10px;
-      width: 700px;
-      max-width: 90%;
+      /* Reduzido levemente */
+      border-radius: 12px;
+      width: 800px;
+      /* Ajuste Intermediário (antes 700->1000->800) */
+      max-width: 95%;
       position: relative;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       animation: fadeIn 0.3s ease;
-      overflow: hidden;
-      /* Importante para o círculo vermelho */
       border-top: none;
+
+      /* Scrollbar para telas pequenas ou expansão dinâmica */
+      max-height: 80vh;
+      overflow-y: auto;
+
+      /* Garante que o scrollbar não fique sobre o conteúdo */
+      scrollbar-width: thin;
+      scrollbar-color: var(--ifg-green) #f1f1f1;
+    }
+
+    /* Estilização da Scrollbar (Webkit/Chrome/Edge) */
+    .modal-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .modal-box::-webkit-scrollbar-thumb {
+      background-color: var(--ifg-green);
+      border-radius: 4px;
+      border: 2px solid #f1f1f1;
+    }
+
+    .modal-box::-webkit-scrollbar-thumb:hover {
+      background-color: var(--ifg-green-dark);
+    }
+
+    /* Overrides para Texto Ajustado */
+    .modal-box label {
+      font-size: 1rem !important;
+      /* Padrão legível */
+      margin-bottom: 6px;
+    }
+
+    .modal-box input,
+    .modal-box select,
+    .modal-box textarea {
+      font-size: 1rem !important;
+      padding: 10px !important;
+    }
+
+    .modal-box .btn-salvar {
+      font-size: 1rem !important;
+      padding: 12px !important;
     }
 
     /* Estilos Decorativos (IFG Theme) - Aplicados a TODOS os modais com .modal-box */
@@ -450,19 +498,94 @@
       grid-column: span 2;
     }
 
-    @media (max-width: 768px) {
+    /* --- Estilos do Grupo de Armazenamento (Modal) --- */
+    .storage-group {
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .storage-container {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    .storage-type,
+    .storage-capacity {
+      flex: 1;
+    }
+
+    /* Força tamanho da fonte para manter consistência com o resto do modal */
+    .storage-type label,
+    .storage-capacity label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 1rem !important;
+      color: var(--text-primary);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      height: 48px;
+      /* Altura para alinhar com inputs */
+    }
+
+    .radio-group label {
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 1rem !important;
+      margin: 0;
+    }
+
+    .radio-group input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+
+    .storage-capacity input {
+      width: 100%;
+    }
+
+    .storage-divider {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin-top: 20px;
+    }
+
+    /* Responsividade Melhorada */
+    @media (max-width: 900px) {
       .modal-box {
         width: 95%;
         padding: 20px;
+        /* Menos padding em mobile */
       }
 
       #formAtivo {
         grid-template-columns: 1fr;
+        /* Coluna única em telas menores */
         gap: 15px;
       }
 
       .span-2 {
         grid-column: span 1;
+      }
+
+      /* Responsividade do Armazenamento */
+      .storage-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .radio-group {
+        height: auto;
+        flex-wrap: wrap;
       }
     }
 
@@ -553,25 +676,40 @@
       max-width: 95%;
     }
 
-    .btn-salvar {
-      width: 50%;
+    /* Aumentando especificidade para garantir que não seja sobrescrito */
+    .modal-box .btn-salvar {
+      width: fit-content !important;
+      /* Ajuste EXATO ao texto */
+      min-width: 0 !important;
+      /* Remove restrição mínima */
       grid-column: span 2;
-      margin: 10px auto;
-      display: block;
-      padding: 12px;
-      background-color: var(--ifg-green);
-      color: var(--white);
-      border: none;
-      border-radius: 6px;
+      margin: 20px auto 10px auto !important;
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px !important;
+      /* Padding equilibrado */
+      background-color: var(--ifg-green) !important;
+      color: var(--white) !important;
+      border: none !important;
+      border-radius: 8px !important;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 1rem !important;
       font-weight: 600;
       font-family: var(--font-heading);
-      transition: background 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(48, 147, 60, 0.2);
     }
 
-    .btn-salvar:hover {
-      background-color: var(--ifg-green-dark);
+    .modal-box .btn-salvar:hover {
+      background-color: var(--ifg-green-dark) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(48, 147, 60, 0.3);
+    }
+
+    .modal-box .btn-salvar:active {
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -582,7 +720,7 @@
       <button id="sidebarToggle" title="Recolher Menu">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <div class="logo-area" style="text-align: center; margin-bottom: 2rem; margin-top: 1.5rem;">
+      <div class="logo-area" style="text-align: center; margin-bottom: 2rem; margin-top: 1.5rem">
         <a href="dashboard.html" style="display: inline-block; transition: transform 0.2s">
           <img src="images/logo_ifg.png" alt="Logo IFG - Voltar ao Dashboard" style="
                 width: 100%;
@@ -608,7 +746,8 @@
         </a>
 
         <a href="#" class="menu-item" style="margin-top: auto" id="btnSair">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Sair</span>
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Sair</span>
         </a>
       </nav>
     </aside>
@@ -763,18 +902,18 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // --- SIDEBAR TOGGLE ---
-      const sidebar = document.getElementById('sidebar');
-      const toggleBtn = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("sidebarToggle");
       if (toggleBtn) {
-        const toggleIcon = toggleBtn.querySelector('i');
-        toggleBtn.addEventListener('click', () => {
-          sidebar.classList.toggle('collapsed');
-          if (sidebar.classList.contains('collapsed')) {
-            toggleIcon.classList.remove('fa-chevron-left');
-            toggleIcon.classList.add('fa-chevron-right');
+        const toggleIcon = toggleBtn.querySelector("i");
+        toggleBtn.addEventListener("click", () => {
+          sidebar.classList.toggle("collapsed");
+          if (sidebar.classList.contains("collapsed")) {
+            toggleIcon.classList.remove("fa-chevron-left");
+            toggleIcon.classList.add("fa-chevron-right");
           } else {
-            toggleIcon.classList.remove('fa-chevron-right');
-            toggleIcon.classList.add('fa-chevron-left');
+            toggleIcon.classList.remove("fa-chevron-right");
+            toggleIcon.classList.add("fa-chevron-left");
           }
         });
       }
