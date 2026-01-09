@@ -11,14 +11,15 @@ export interface User {
   perfil_id: number;
 }
 
-
 // function buscarUsuarioPorMatricula: recupera um usuário do banco pela matrícula.
 // Retorna o objeto do usuário ou undefined se não encontrar.
 export async function buscarUsuarioPorMatricula(matricula: string) {
-  const result = await pool.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
+  const result = await pool.query(
+    "SELECT * FROM responsavel WHERE matricula = $1",
+    [matricula]
+  );
   return result.rows[0];
 }
-
 
 // function criarUsuario: insere um novo usuário na tabela 'responsavel'.
 // Retorna o usuário recém-criado.

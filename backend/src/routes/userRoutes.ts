@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { cadastrar, autenticar, criarPerfil, removerPerfil, listarPerfis, atualizarPerfil } from "../controllers/userController";
+import {
+  cadastrar,
+  autenticar,
+  criarPerfil,
+  removerPerfil,
+  listarPerfis,
+  atualizarPerfil,
+} from "../controllers/userController";
 
 const router = Router();
 

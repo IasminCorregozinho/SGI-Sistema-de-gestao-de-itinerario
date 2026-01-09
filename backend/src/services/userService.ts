@@ -1,4 +1,8 @@
-import { buscarUsuarioPorMatricula, criarUsuario, User } from "../models/userModel";
+import {
+  buscarUsuarioPorMatricula,
+  criarUsuario,
+  User,
+} from "../models/userModel";
 import { pool } from "../config/db";
 
 export async function registrarUsuario(user: User) {
@@ -10,16 +14,25 @@ export async function registrarUsuario(user: User) {
 export async function realizarLogin(matricula: string, senha: string) {
   const user = await buscarUsuarioPorMatricula(matricula);
   if (!user) throw new Error("Usuário não encontrado");
-  if (user.senha !== senha) throw new Error("Senha incorreta! Por favor verifique a senha digitada.");
+  if (user.senha !== senha)
+    throw new Error("Senha incorreta! Por favor verifique a senha digitada.");
   return user;
 }
 
 // RF002: Inclusão de perfis (Criação de novos usuários com perfil definido)
-export async function criarPerfil(nome: string, matricula: string, senha: string, perfil_id: number = 1) {
+export async function criarPerfil(
+  nome: string,
+  matricula: string,
+  senha: string,
+  perfil_id: number = 1
+) {
   // Por padrão, cria com perfil 1 (Suporte) se não especificado
   const client = await pool.connect();
   try {
-    const existingUser = await client.query("SELECT * FROM responsavel WHERE matricula = $1", [matricula]);
+    const existingUser = await client.query(
+      "SELECT * FROM responsavel WHERE matricula = $1",
+      [matricula]
+    );
     if (existingUser.rows.length > 0) {
       throw new Error("Matrícula já cadastrada para outro usuário.");
     }
@@ -48,7 +61,15 @@ export async function excluirPerfil(id: number) {
 }
 
 // RF002: Edição de perfis (Alteração parcial)
-export async function atualizarPerfil(id: number, dados: { nome?: string; matricula?: string; senha?: string; perfil_id?: number }) {
+export async function atualizarPerfil(
+  id: number,
+  dados: {
+    nome?: string;
+    matricula?: string;
+    senha?: string;
+    perfil_id?: number;
+  }
+) {
   const fields: string[] = [];
   const values: any[] = [];
   let idx = 1;
@@ -75,7 +96,9 @@ export async function atualizarPerfil(id: number, dados: { nome?: string; matric
   }
 
   values.push(id);
-  const query = `UPDATE responsavel SET ${fields.join(", ")} WHERE responsavel_id = $${idx} RETURNING *`;
+  const query = `UPDATE responsavel SET ${fields.join(
+    ", "
+  )} WHERE responsavel_id = $${idx} RETURNING *`;
 
   const result = await pool.query(query, values);
 
@@ -88,6 +111,8 @@ export async function atualizarPerfil(id: number, dados: { nome?: string; matric
 
 // Auxiliar: Consulta de perfis (Listagem de usuários cadastrados)
 export async function listarPerfis() {
-  const result = await pool.query("SELECT * FROM responsavel ORDER BY responsavel_id ASC");
+  const result = await pool.query(
+    "SELECT * FROM responsavel ORDER BY responsavel_id ASC"
+  );
   return result.rows;
 }
