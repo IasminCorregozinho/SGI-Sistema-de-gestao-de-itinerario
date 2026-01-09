@@ -1,45 +1,54 @@
-import { pool } from '../config/db';
-import { Ativo, HistoricoAtivo } from '../models/ativo';
+import { pool } from "../config/db";
+import { Ativo, HistoricoAtivo } from "../models/ativo";
 
 // Buscar um ativo pelo ID
 export async function buscarPorId(id: number): Promise<Ativo | null> {
-    const result = await pool.query('SELECT * FROM ATIVO WHERE ativo_id = $1', [id]);
+  const result = await pool.query("SELECT * FROM ATIVO WHERE ativo_id = $1", [
+    id,
+  ]);
 
-    // Mapear o retorno do banco 
-    if (result.rows.length > 0) {
-        const row = result.rows[0];
-        return {
-            id: row.ativo_id,
-            patrimonio: row.patrimonio,
-            id_tipo_ativo: row.tipo_ativo,
-            id_status: row.status,
-            id_localizacao: row.localizacao,
-            id_responsavel: row.responsavel,
-            marca_modelo: row.marca_modelo,
-            obs: row.observacoes
-        } as Ativo;
-    }
-    return null;
-    return null;
+  // Mapear o retorno do banco
+  if (result.rows.length > 0) {
+    const row = result.rows[0];
+    return {
+      id: row.ativo_id,
+      patrimonio: row.patrimonio,
+      id_tipo_ativo: row.tipo_ativo,
+      id_status: row.status,
+      id_localizacao: row.localizacao,
+      id_responsavel: row.responsavel,
+      marca_modelo: row.marca_modelo,
+      numero_serie: row.numero_serie, // Mapeando
+      obs: row.observacoes,
+      tipo_armazenamento: row.tipo_armazenamento,
+      capacidade_armazenamento: row.capacidade_armazenamento,
+    } as Ativo;
+  }
+  return null;
 }
 
 // Buscar um ativo pelo Patrimônio
-export async function buscarPorPatrimonio(patrimonio: string): Promise<Ativo | null> {
-    const result = await pool.query('SELECT * FROM ATIVO WHERE patrimonio = $1', [patrimonio]);
+export async function buscarPorPatrimonio(
+  patrimonio: string
+): Promise<Ativo | null> {
+  const result = await pool.query("SELECT * FROM ATIVO WHERE patrimonio = $1", [
+    patrimonio,
+  ]);
 
-    if (result.rows.length > 0) {
-        const row = result.rows[0];
-        return {
-            id: row.ativo_id,
-            patrimonio: row.patrimonio
-        } as Ativo;
-    }
-    return null;
+  if (result.rows.length > 0) {
+    const row = result.rows[0];
+    return {
+      id: row.ativo_id,
+      patrimonio: row.patrimonio,
+      numero_serie: row.numero_serie, // Mapeando
+    } as Ativo;
+  }
+  return null;
 }
 
 // Buscar todos os ativos
 export async function buscarTodos(): Promise<Ativo[]> {
-    const query = `
+  const query = `
         SELECT 
             a.*, 
             s.descricao as status_nome,
@@ -52,51 +61,81 @@ export async function buscarTodos(): Promise<Ativo[]> {
         LEFT JOIN localizacao_ativo l ON a.localizacao = l.localizacao_id
         LEFT JOIN RESPONSAVEL r ON a.responsavel = r.responsavel_id
     `;
-    const result = await pool.query(query);
+  const result = await pool.query(query);
 
-    return result.rows.map(row => ({
-        id: row.ativo_id,
-        patrimonio: row.patrimonio,
-        id_tipo_ativo: row.tipo_ativo,
-        id_status: row.status,
-        id_localizacao: row.localizacao,
-        id_responsavel: row.responsavel,
-        marca_modelo: row.marca_modelo,
-        obs: row.observacoes,
-        // Campos extras
-        status_nome: row.status_nome,
-        tipo_ativo_nome: row.tipo_ativo_nome,
-        localizacao_nome: row.localizacao_nome,
-        responsavel_nome: row.responsavel_nome
-    } as Ativo));
+  return result.rows.map(
+    (row) =>
+    ({
+      id: row.ativo_id,
+      patrimonio: row.patrimonio,
+      id_tipo_ativo: row.tipo_ativo,
+      id_status: row.status,
+      id_localizacao: row.localizacao,
+      id_responsavel: row.responsavel,
+      marca_modelo: row.marca_modelo,
+      numero_serie: row.numero_serie, // Mapeando
+      obs: row.observacoes,
+      tipo_armazenamento: row.tipo_armazenamento,
+      capacidade_armazenamento: row.capacidade_armazenamento,
+      // Campos extras
+      status_nome: row.status_nome,
+      tipo_ativo_nome: row.tipo_ativo_nome,
+      localizacao_nome: row.localizacao_nome,
+      responsavel_nome: row.responsavel_nome,
+    } as Ativo)
+  );
 }
 
 // Criar novo ativo
 export async function criar(ativo: Ativo): Promise<Ativo> {
-    const query = `
-        INSERT INTO ATIVO (patrimonio, tipo_ativo, status, localizacao, responsavel, marca_modelo, observacoes) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+  const query = `
+        INSERT INTO ATIVO (patrimonio, tipo_ativo, status, localizacao, responsavel, marca_modelo, numero_serie, observacoes, tipo_armazenamento, capacidade_armazenamento) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
     `;
-    const values = [ativo.patrimonio, ativo.id_tipo_ativo, ativo.id_status, ativo.id_localizacao, ativo.id_responsavel, ativo.marca_modelo, ativo.obs];
-    const result = await pool.query(query, values);
-    return result.rows[0];
+  const values = [
+    ativo.patrimonio,
+    ativo.id_tipo_ativo,
+    ativo.id_status,
+    ativo.id_localizacao,
+    ativo.id_responsavel,
+    ativo.marca_modelo,
+    ativo.numero_serie, // Novo valor
+    ativo.obs,
+    ativo.tipo_armazenamento,
+    ativo.capacidade_armazenamento,
+  ];
+  const result = await pool.query(query, values);
+  return result.rows[0];
 }
 
 // Atualizar ativo existente
 export async function atualizar(id: number, ativo: Ativo): Promise<Ativo> {
-    const query = `
+  const query = `
         UPDATE ATIVO SET 
-            tipo_ativo = $1, status = $2, localizacao = $3, responsavel = $4, patrimonio = $5, marca_modelo = $6, observacoes = $7
-        WHERE ativo_id = $8 RETURNING *
+            tipo_ativo = $1, status = $2, localizacao = $3, responsavel = $4, patrimonio = $5, marca_modelo = $6, numero_serie = $7, observacoes = $8,
+            tipo_armazenamento = $9, capacidade_armazenamento = $10
+        WHERE ativo_id = $11 RETURNING *
     `;
-    const values = [ativo.id_tipo_ativo, ativo.id_status, ativo.id_localizacao, ativo.id_responsavel, ativo.patrimonio, ativo.marca_modelo, ativo.obs, id];
-    const result = await pool.query(query, values);
-    return result.rows[0];
+  const values = [
+    ativo.id_tipo_ativo,
+    ativo.id_status,
+    ativo.id_localizacao,
+    ativo.id_responsavel,
+    ativo.patrimonio,
+    ativo.marca_modelo,
+    ativo.numero_serie, // Novo valor
+    ativo.obs,
+    ativo.tipo_armazenamento,
+    ativo.capacidade_armazenamento,
+    id,
+  ];
+  const result = await pool.query(query, values);
+  return result.rows[0];
 }
 
 // Inserir histórico
 export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
-    const query = `
+  const query = `
         INSERT INTO historico_ativo (
             ativo_id, data_movimentacao, usuario_alteracao, 
             status_anterior, status_novo,
@@ -104,23 +143,26 @@ export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
             responsavel_anterior, responsavel_novo, observacao, valor_manutencao
         ) VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `;
-    await pool.query(query, [
-        hist.ativo_id, hist.usuario_alteracao,
-        hist.status_anterior, hist.status_novo,
-        hist.localizacao_anterior, hist.localizacao_novo,
-        hist.responsavel_anterior, hist.responsavel_novo,
-        hist.observacao,
-        hist.valor_manutencao || null
-    ]);
+  await pool.query(query, [
+    hist.ativo_id,
+    hist.usuario_alteracao,
+    hist.status_anterior,
+    hist.status_novo,
+    hist.localizacao_anterior,
+    hist.localizacao_novo,
+    hist.responsavel_anterior,
+    hist.responsavel_novo,
+    hist.observacao,
+    hist.valor_manutencao || null,
+  ]);
 }
 
-// FUNÇÃO DO DASHBOARD 
+// FUNÇÃO DO DASHBOARD
 // Calcula os KPIs (Indicadores) principais para o Dashboard.
 // Retorna: Total de ativos, Total em Estoque, Total em Manutenção e Total Descartado.
 export async function obterDadosDashboard() {
-
-    // USA SUM com CASE WHEN para contar condicionalmente em um única consulta rápida
-    const query = `
+  // USA SUM com CASE WHEN para contar condicionalmente em um única consulta rápida
+  const query = `
         SELECT 
             COUNT(*)::int as total,
             COALESCE(SUM(CASE WHEN status = 15 THEN 1 ELSE 0 END), 0)::int as estoque,
@@ -129,29 +171,29 @@ export async function obterDadosDashboard() {
         FROM ATIVO
     `;
 
-    try {
-        const result = await pool.query(query);
-        return result.rows[0];
-    } catch (error) {
-        console.error('Erro ao buscar estatísticas do dashboard:', error);
-        throw error;
-    }
+  try {
+    const result = await pool.query(query);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas do dashboard:", error);
+    throw error;
+  }
 }
 
 export async function obterContagemPorCategoria() {
-    const query = `
+  const query = `
         SELECT t.descricao as categoria, COUNT(*) as quantidade
         FROM ATIVO a
         JOIN TIPO_ATIVO t ON a.tipo_ativo = t.tipo_ativo_id
         GROUP BY t.descricao
         ORDER BY quantidade DESC;
     `;
-    const result = await pool.query(query);
-    return result.rows;
+  const result = await pool.query(query);
+  return result.rows;
 }
 
 export async function obterMovimentacoesRecentes() {
-    const query = `
+  const query = `
         SELECT 
             a.patrimonio as ativo,      
             r.nome as usuario,
@@ -169,34 +211,39 @@ export async function obterMovimentacoesRecentes() {
         LIMIT 5
     `;
 
-    const result = await pool.query(query);
-    return result.rows;
+  const result = await pool.query(query);
+  return result.rows;
 }
 
 // Buscar todos os status disponíveis
 export async function buscarStatus() {
-    const result = await pool.query('SELECT * FROM STATUS_ATIVO');
-    return result.rows; // { status_id, descricao }
+  const result = await pool.query(
+    "SELECT status_id, descricao FROM STATUS_ATIVO ORDER BY descricao"
+  );
+  return result.rows; // { status_id, descricao }
 }
 
 // Buscar todas as localizações disponíveis
 export async function buscarLocalizacoes() {
-    const result = await pool.query(`
+  const result = await pool.query(`
         SELECT localizacao_id, COALESCE(setor_sala, reitoria, 'Sem Nome') as setor_sala, reitoria 
         FROM localizacao_ativo
+        ORDER BY setor_sala
     `);
-    return result.rows; // { localizacao_id, setor_sala, reitoria }
+  return result.rows; // { localizacao_id, setor_sala, reitoria }
 }
 
 // Buscar todos os tipos de ativo
 export async function buscarTiposAtivo() {
-    const result = await pool.query('SELECT * FROM tipo_ativo');
-    return result.rows; // { tipo_ativo_id, descricao }
+  const result = await pool.query(
+    "SELECT tipo_ativo_id, descricao FROM tipo_ativo ORDER BY descricao"
+  );
+  return result.rows; // { tipo_ativo_id, descricao }
 }
 
 // Buscar histórico de um ativo
 export async function buscarHistoricoPorAtivoId(id: number) {
-    const query = `
+  const query = `
         SELECT 
             h.data_movimentacao,
             h.usuario_alteracao,
@@ -230,6 +277,6 @@ export async function buscarHistoricoPorAtivoId(id: number) {
         WHERE h.ativo_id = $1
         ORDER BY h.data_movimentacao DESC
     `;
-    const result = await pool.query(query, [id]);
-    return result.rows;
+  const result = await pool.query(query, [id]);
+  return result.rows;
 }
