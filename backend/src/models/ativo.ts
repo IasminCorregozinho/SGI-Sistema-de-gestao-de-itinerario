@@ -41,5 +41,6 @@ export interface HistoricoAtivo {
   responsavel_anterior: number | null;
   responsavel_novo: number;
   observacao: string;
+  dados_alteracao?: string;
   valor_manutencao?: number;
 }

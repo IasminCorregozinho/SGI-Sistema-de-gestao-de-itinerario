@@ -29,6 +29,9 @@ const ModalAtivo = {
                         <select id="tipo_ativo" required>
                             <option value="">Carregando...</option>
                         </select>
+                        <div style="text-align: right; margin-top: 2px;">
+                            <a href="#" id="btnNovoTipoAtivo" class="quick-add-link">+ Novo tipo de Ativo</a>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -87,6 +90,9 @@ const ModalAtivo = {
                         <select id="localizacao" required>
                             <option value="">Carregando...</option>
                         </select>
+                        <div style="text-align: right; margin-top: 2px;">
+                            <a href="#" id="btnNovaLocalizacao" class="quick-add-link">+ Nova Localização</a>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -101,8 +107,29 @@ const ModalAtivo = {
                         <textarea id="observacoes" rows="3"></textarea>
                     </div>
 
+                    <!-- Barra de Carregamento -->
+                    <div id="modalLoadingBar" class="span-2" style="width: 80%; background-color: #f3f4f6; border-radius: 4px; height: 6px; margin: 15px auto; overflow: hidden; display: none;">
+                        <div id="modalProgressBar" style="width: 0%; height: 100%; background-color: var(--ifg-green); border-radius: 4px; transition: width 0.4s ease-in-out;"></div>
+                    </div>
+
                     <button type="submit" class="btn-salvar">Salvar Ativo</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Modal Cadastro Rapido (Mini Modal) -->
+        <div id="modalCadastroRapido" class="modal-overlay" style="z-index: 2000;">
+            <div class="modal-box" style="width: 400px; max-width: 90%; padding: 25px; text-align: center;">
+                <h3 id="tituloCadastroRapido" style="font-family: var(--font-heading); color: var(--ifg-green); margin-bottom: 20px; font-weight: 700;">Novo Item</h3>
+                
+                <div class="form-group">
+                    <input type="text" id="inputCadastroRapido" placeholder="Digite o nome..." autocomplete="off">
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                    <button id="btnCancelarRapido" class="btn-cancel" style="width: 120px; justify-content: center;">Cancelar</button>
+                    <button id="btnSalvarRapido" class="btn-salvar" style="width: 120px; margin: 0 !important; justify-content: center;">Salvar</button>
+                </div>
             </div>
         </div>
         `;
@@ -144,6 +171,12 @@ const ModalAtivo = {
                 pointer-events: none;
             }
 
+            /* Fix para garantir interatividade dos campos acima da decoração */
+            #formAtivo, #modalTitle, #msgCadastro {
+                position: relative;
+                z-index: 5;
+            }
+
             #modalCadastro h2 {
                 text-align: center;
                 color: var(--ifg-green);
@@ -177,6 +210,18 @@ const ModalAtivo = {
             .close-btn:hover {
                 color: var(--ifg-red);
                 background-color: rgba(234, 54, 54, 0.1);
+            }
+
+            .quick-add-link {
+                font-size: 11px;
+                color: var(--ifg-green);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+            .quick-add-link:hover {
+                color: var(--ifg-green-dark);
+                text-decoration: underline;
             }
         `;
     document.head.appendChild(style);
@@ -233,6 +278,24 @@ const ModalAtivo = {
     const tipoSelect = document.getElementById("tipo_ativo");
     if (tipoSelect) {
       tipoSelect.addEventListener("change", () => this.verificarTipoAtivo());
+    }
+
+    // LISTENER PARA NOVO TIPO
+    const btnNovoTipo = document.getElementById("btnNovoTipoAtivo");
+    if (btnNovoTipo) {
+      btnNovoTipo.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.criarNovoTipo();
+      });
+    }
+
+    // LISTENER PARA NOVA LOCALIZAÇÃO
+    const btnNovaLocal = document.getElementById("btnNovaLocalizacao");
+    if (btnNovaLocal) {
+      btnNovaLocal.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.criarNovaLocalizacao();
+      });
     }
 
     // Monitorar Radio Buttons de Armazenamento
@@ -539,9 +602,9 @@ const ModalAtivo = {
     const div = document.getElementById(divId);
     div.style.display = "block";
     div.textContent = texto;
-    div.style.backgroundColor = isErro ? "#f8d7da" : "#d1fae5";
-    div.style.color = isErro ? "#721c24" : "#065f46";
-    div.style.border = isErro ? "1px solid #f5c6cb" : "1px solid #a7f3d0";
+    div.style.backgroundColor = isErro ? "#fee2e2" : "#d1fae5"; // Match dashboard colors exactly (#fee2e2 vs #f8d7da)
+    div.style.color = isErro ? "#991b1b" : "#065f46"; // Corresponder cores do dashboard (#991b1b vs #721c24)
+    div.style.border = "none"; // Remover explicitamente a borda
 
     if (!isErro) {
       setTimeout(() => {
@@ -563,8 +626,8 @@ const ModalAtivo = {
       id_status: parseInt(document.getElementById("status").value),
       id_localizacao: parseInt(document.getElementById("localizacao").value),
       id_responsavel: parseInt(document.getElementById("responsavel").value),
-      obs: document.getElementById("observacoes").value,
-      obs: document.getElementById("observacoes").value,
+      responsavel: parseInt(document.getElementById("responsavel").value),
+      observacao: document.getElementById("observacoes").value,
       valor_manutencao: this.parseValorManutencao(
         document.getElementById("valor_manutencao").value
       ),
@@ -589,7 +652,9 @@ const ModalAtivo = {
       let houveAlteracao = false;
 
       for (const key in dadosFormulario) {
-        let valorOriginal = this.dadosOriginais[key];
+        // Mapeia 'observacao' para 'obs' ao buscar em dadosOriginais
+        const keyOriginal = key === "observacao" ? "obs" : key;
+        let valorOriginal = this.dadosOriginais[keyOriginal];
         let valorNovo = dadosFormulario[key];
 
         // Normalização para comparação (null vs undefined vs vazio)
@@ -633,7 +698,33 @@ const ModalAtivo = {
       }
     }
 
+    // --- LÓGICA DE LOADING BAR ---
+    const loadingContainer = document.getElementById("modalLoadingBar");
+    const progressBar = document.getElementById("modalProgressBar");
+    const btnSalvar = document.querySelector(".btn-salvar");
+    const btnClose = document.getElementById("fecharModalCadastro");
+
+    // Mostra barra e desabilita
+    if (loadingContainer && progressBar) {
+      loadingContainer.style.display = "block";
+      progressBar.style.width = "0%";
+      void progressBar.offsetWidth; // Forçar novo layout (reflow)
+      progressBar.style.width = "40%";
+    }
+    if (btnSalvar) {
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = "Salvando...";
+      btnSalvar.style.opacity = "0.7";
+      btnSalvar.style.cursor = "not-allowed";
+    }
+    if (btnClose) btnClose.style.pointerEvents = "none";
+
     try {
+      // Simula um pouco de progresso visual
+      setTimeout(() => {
+        if (progressBar) progressBar.style.width = "75%";
+      }, 400);
+
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -644,18 +735,40 @@ const ModalAtivo = {
       });
 
       if (response.ok) {
+        if (progressBar) progressBar.style.width = "100%";
+
         const msgSucesso = isEdicao
           ? "Ativo atualizado com sucesso!"
           : "Ativo cadastrado com sucesso!";
-        this.mostrarMensagem("msgCadastro", msgSucesso, false);
+
+        // Usar divMensagemSistema (Global) em vez de msgCadastro (Local do Modal)
+        // Aguarda visualização do 100%
         setTimeout(() => {
           document.getElementById("modalCadastro").style.display = "none";
           this.resetForm();
 
-          // Se estiver na tela de listagem, recarrega a lista
+          // Exibir mensagem APÓS fechar o modal
+          // Usar divMensagemSistema (Global)
+          if (typeof window.mostrarMensagem === "function") {
+            window.mostrarMensagem("divMensagemSistema", msgSucesso, false);
+          } else {
+            // Alternativa se não estiver no dashboard
+            this.mostrarMensagem("divMensagemSistema", msgSucesso, false);
+          }
+
+          // Resetar elementos da UI
+          if (loadingContainer) loadingContainer.style.display = "none";
+          if (btnSalvar) {
+            btnSalvar.disabled = false;
+            btnSalvar.textContent = "Salvar Ativo";
+            btnSalvar.style.opacity = "1";
+            btnSalvar.style.cursor = "pointer";
+          }
+          if (btnClose) btnClose.style.pointerEvents = "auto";
+
+          // Recarrega lsita
           if (typeof carregarAtivos === "function") {
             carregarAtivos();
-            // Mostra mensagem global se existir
             const msgGlobal = document.getElementById("divMensagemSistema");
             if (msgGlobal) {
               msgGlobal.textContent = msgSucesso;
@@ -665,9 +778,21 @@ const ModalAtivo = {
               setTimeout(() => (msgGlobal.style.display = "none"), 3000);
             }
           }
-        }, 1500); // Espera 1.5s para o usuário ver a mensagem
+        }, 1200); // Delay suave
       } else {
+        // Erro na resposta
         const errorData = await response.json();
+
+        // Reset UI
+        if (loadingContainer) loadingContainer.style.display = "none";
+        if (btnSalvar) {
+          btnSalvar.disabled = false;
+          btnSalvar.textContent = "Salvar Ativo";
+          btnSalvar.style.opacity = "1";
+          btnSalvar.style.cursor = "pointer";
+        }
+        if (btnClose) btnClose.style.pointerEvents = "auto";
+
         this.mostrarMensagem(
           "msgCadastro",
           errorData.error || "Erro ao salvar ativo.",
@@ -688,11 +813,161 @@ const ModalAtivo = {
     const numero = parseFloat(limpo);
     return isNaN(numero) ? null : numero;
   },
+
+  // === FUNCIONALIDADE DE CADASTRO RÁPIDO ===
+
+  // Variáveis de controle do Cadastro Rápido
+  tipoCadastroRapido: null, // "tipo" ou "localizacao"
+
+  abrirModalCadastroRapido: function (tipo) {
+    this.tipoCadastroRapido = tipo; // Define o contexto
+    const modal = document.getElementById("modalCadastroRapido");
+    const title = document.getElementById("tituloCadastroRapido");
+    const input = document.getElementById("inputCadastroRapido");
+
+    if (!modal || !title || !input) return;
+
+    input.value = ""; // Limpa input
+    modal.style.display = "flex";
+
+    if (tipo === "tipo") {
+      title.textContent = "Novo Tipo de Ativo";
+      input.placeholder = "Ex: Impressora, Monitor...";
+    } else {
+      title.textContent = "Nova Localização";
+      input.placeholder = "Ex: Lab 01, Biblioteca...";
+    }
+
+    setTimeout(() => input.focus(), 100); // Foca no input
+  },
+
+  fecharModalCadastroRapido: function () {
+    const modal = document.getElementById("modalCadastroRapido");
+    if (modal) modal.style.display = "none";
+    this.tipoCadastroRapido = null;
+  },
+
+  salvarCadastroRapido: async function () {
+    const input = document.getElementById("inputCadastroRapido");
+    const nome = input.value.trim().toUpperCase();
+
+    if (!nome) {
+      alert("Por favor, digite um nome.");
+      return;
+    }
+
+    const ehTipo = this.tipoCadastroRapido === "tipo";
+    const url = ehTipo ? "/ativos/tipos" : "/ativos/localizacoes";
+    const bodyKey = ehTipo ? "descricao" : "nome"; // Backend espera chaves diferentes
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [bodyKey]: nome })
+      });
+
+      if (response.ok) {
+        const novo = await response.json();
+
+        if (ehTipo) {
+          // Recarrega Tipos
+          const resLista = await fetch("/ativos/tipos");
+          const lista = await resLista.json();
+          this.popularSelect("tipo_ativo", lista, "tipo_ativo_id", "descricao");
+
+          // Seleciona novo e trigga validação
+          const select = document.getElementById("tipo_ativo");
+          if (select) {
+            select.value = novo.tipo_ativo_id;
+            this.verificarTipoAtivo();
+          }
+          this.mostrarMensagem("msgCadastro", "Tipo de Ativo criado com sucesso!", false);
+
+        } else {
+          // Recarrega Localizações
+          const resLista = await fetch("/ativos/localizacoes");
+          const lista = await resLista.json();
+          this.popularSelect("localizacao", lista, "localizacao_id", "setor_sala");
+
+          // Seleciona novo
+          const select = document.getElementById("localizacao");
+          if (select) {
+            select.value = novo.localizacao_id;
+          }
+          this.mostrarMensagem("msgCadastro", "Localização criada com sucesso!", false);
+        }
+
+        this.fecharModalCadastroRapido();
+
+      } else {
+        alert("Erro ao criar item. Verifique se já existe.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro de conexão.");
+    }
+  },
+
+  criarNovoTipo: function () {
+    this.abrirModalCadastroRapido("tipo");
+  },
+
+  criarNovaLocalizacao: function () {
+    this.abrirModalCadastroRapido("localizacao");
+  },
 };
 
 // Auto-inicializar se o DOM já estiver pronto, ou esperar
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => ModalAtivo.init());
+  document.addEventListener("DOMContentLoaded", () => {
+    ModalAtivo.init();
+    // Configurar listeners extras para Cadastro Rapido
+    const btnSave = document.getElementById("btnSalvarRapido");
+    const btnCancel = document.getElementById("btnCancelarRapido");
+
+    if (btnSave) btnSave.addEventListener("click", (e) => {
+      e.preventDefault();
+      ModalAtivo.salvarCadastroRapido();
+    });
+
+    if (btnCancel) btnCancel.addEventListener("click", (e) => {
+      e.preventDefault();
+      ModalAtivo.fecharModalCadastroRapido();
+    });
+
+    // Suporte a tecla Enter para Cadastro Rapido
+    const inputQuick = document.getElementById("inputCadastroRapido");
+    if (inputQuick) inputQuick.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ModalAtivo.salvarCadastroRapido();
+      }
+    });
+  });
 } else {
   ModalAtivo.init();
+  // Setup extra listeners immediately if loaded
+  setTimeout(() => {
+    const btnSave = document.getElementById("btnSalvarRapido");
+    const btnCancel = document.getElementById("btnCancelarRapido");
+
+    if (btnSave) btnSave.addEventListener("click", (e) => {
+      e.preventDefault();
+      ModalAtivo.salvarCadastroRapido();
+    });
+
+    if (btnCancel) btnCancel.addEventListener("click", (e) => {
+      e.preventDefault();
+      ModalAtivo.fecharModalCadastroRapido();
+    });
+
+    const inputQuick = document.getElementById("inputCadastroRapido");
+    if (inputQuick) inputQuick.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ModalAtivo.salvarCadastroRapido();
+      }
+    });
+  }, 100);
 }
