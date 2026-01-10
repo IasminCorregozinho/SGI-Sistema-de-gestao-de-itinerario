@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login :: SGI | IFG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+
+    <!-- CSS Separado -->
+    <link rel="stylesheet" href="../css/index.css" />
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Painel Esquerdo com Branding -->
+        <div class="left-pane">
+            <div class="brand-overlay"></div>
+            <div class="brand-content">
+                <div class="logo-area">
+                    <div class="logo-placeholder">
+                        <!-- Caminho de imagem ajustado -->
+                        <img src="../images/logo_ifg.png" alt="Logo IFG" />
+                    </div>
+                </div>
+
+                <div class="welcome-text">
+                    <h1>Bem-vindo de volta!</h1>
+                    <h2 class="system-name">SGI - Sistema de Gestão de Itinerário</h2>
+                    <div class="divider"></div>
+                    <p class="description">
+                        Acesse a plataforma para gerenciar os ativos, estoque e
+                        solicitações de forma integrada e eficiente.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel Direito com Formulário -->
+        <div class="right-pane">
+            <div class="login-card">
+                <div class="card-header">
+                    <h3>Acesso ao Sistema</h3>
+                    <p>Entre com suas credenciais institucionais</p>
+                </div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="matricula">Matrícula</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="matricula" name="matricula" placeholder="Digite sua matrícula"
+                                required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required />
+                        </div>
+                    </div>
+
+                    <div id="loginError" class="login-error-msg"></div>
+
+                    <button type="submit" class="btn-submit">Entrar</button>
+                </form>
+
+                <div class="card-footer">
+                    <p>IFG - Instituto Federal de Goiás</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Separado -->
+    <script src="../js/index.js"></script>
+</body>
+
+</html>
