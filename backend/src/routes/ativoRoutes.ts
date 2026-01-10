@@ -12,9 +12,11 @@ router.patch("/:id", ativoController.editar);
 router.get("/", ativoController.listar);
 router.get("/dashboard-kpis", ativoController.obterDadosDashboard);
 router.get("/movimentacoes-recentes", ativoController.obterMovimentacoes);
+router.post("/tipos", ativoController.criarTipo); // Nova rota
 router.get("/status", ativoController.listarStatus);
-router.get("/localizacoes", ativoController.listarLocalizacoes);
 router.get("/tipos", ativoController.listarTiposAtivo);
+router.post("/localizacoes", ativoController.criarLocalizacao); // Nova rota
+router.get("/localizacoes", ativoController.listarLocalizacoes);
 router.get("/:id/historico", ativoController.listarHistorico);
 
 export default router;

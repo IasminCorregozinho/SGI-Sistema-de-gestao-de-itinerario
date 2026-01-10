@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SGI :: Dashboard | IFG</title>
+
+    <!-- Fontes Externas - Mantidas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Chart.js - Mantido -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- CSS Separado -->
+    <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <button id="sidebarToggle" title="Recolher Menu">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="logo-area" style="text-align: center; margin-bottom: 2rem; margin-top: 1.5rem">
+                <img src="../images/logo_ifg.png" alt="Logo IFG" style="
+              width: 100%;
+              max-width: 160px;
+              height: auto;
+              border-radius: 12px;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+              background-color: white;
+              padding: 10px;
+            " />
+            </div>
+
+            <nav>
+                <a href="#" class="menu-item">
+                    <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+                </a>
+                <!-- Nota: O modal-ativo.js injeta funcionalidade aqui, verificar se caminhos batem -->
+                <a href="#" id="menuCadastrarAtivo" class="menu-item">
+                    <i class="fa-solid fa-plus"></i> <span>Cadastrar Ativo</span>
+                </a>
+                <a href="listagem.html" class="menu-item">
+                    <i class="fa-solid fa-list"></i> <span>Listagem de Ativos</span>
+                </a>
+                <a href="#" class="menu-item" id="menuGerenciarPerfis" style="display: none">
+                    <i class="fa-solid fa-users-gear"></i> <span>Gerenciar Perfis</span>
+                </a>
+                <a href="#" class="menu-item" style="margin-top: auto" id="btnSair">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Sair</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header>
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Visão geral dos ativos de TI</p>
+                </div>
+
+                <!-- Mensagem Global do Sistema -->
+                <div id="divMensagemSistema" style="
+              display: none;
+              padding: 8px 16px;
+              margin: 10px auto;
+              border-radius: 20px;
+              text-align: center;
+              font-weight: 500;
+              width: fit-content;
+              max-width: 80%;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            "></div>
+
+                <div class="actions">
+                    <!-- Nota: modal-ativo.js controla o click deste botão -->
+                    <button class="btn-primary" id="btnNovoAtivo">
+                        <i class="fa-solid fa-plus"></i> Novo Ativo
+                    </button>
+                    <a href="listagem.html" class="btn-primary">
+                        <i class="fa-solid fa-list"></i> Listagem Ativos
+                    </a>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="card">
+                    <span class="card-label">Total de Ativos</span>
+                    <div class="card-value" id="kpi-total">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Em Estoque</span>
+                    <div class="card-value text-blue" id="kpi-estoque">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Em Manutenção</span>
+                    <div class="card-value text-red" id="kpi-manutencao">---</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">Descartados</span>
+                    <div class="card-value" style="color: var(--ifg-red)" id="kpi-descartado">
+                        ---
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-grid">
+                <div class="card">
+                    <h3>Status dos Ativos</h3>
+                    <div class="chart-area" style="position: relative; height: 350px">
+                        <canvas id="meuGraficoStatus"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Ativos por Categoria</h3>
+                    <div class="chart-area" style="position: relative; height: 350px">
+                        <canvas id="meuGraficoCategoria"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="recent-activity card">
+                <h3>Últimas Movimentações</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Usuário</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL GERENCIAR PERFIS -->
+    <div id="modalGerenciarPerfis" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" id="fecharModalGerenciarPerfis">&times;</span>
+            <h2>Gerenciar Perfis</h2>
+
+            <div style="
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+          ">
+                <h3>Cadastro de Novo Usuário</h3>
+                <form id="formCriarPerfil" style="margin-top: 15px">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="conf_nome" required placeholder="Nome do Responsável" />
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                        <div class="form-group">
+                            <label>Matrícula</label>
+                            <input type="text" id="conf_matricula" required placeholder="Matrícula" />
+                        </div>
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <input type="password" id="conf_senha" required placeholder="Senha" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Perfil</label>
+                        <select id="conf_perfil_id">
+                            <option value="1">Suporte</option>
+                            <option value="2">Coordenação</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-salvar" id="btnSalvarPerfil">
+                        Cadastrar Usuário
+                    </button>
+                    <button type="button" id="btnCancelarEdicao" class="btn-cancelar" style="display: none"
+                        onclick="cancelarEdicao()">
+                        Cancelar
+                    </button>
+                    <div id="msgConfig" style="
+                margin: 10px auto;
+                display: none;
+                padding: 8px 16px;
+                border-radius: 20px;
+                text-align: center;
+                font-weight: 500;
+                width: fit-content;
+                max-width: 90%;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              "></div>
+                </form>
+            </div>
+
+            <div>
+                <h3>Usuários Cadastrados</h3>
+                <div id="msgLista" style="
+              margin: 10px auto;
+              display: none;
+              padding: 8px 16px;
+              border-radius: 20px;
+              text-align: center;
+              font-weight: 500;
+              width: fit-content;
+              max-width: 90%;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            "></div>
+                <div style="margin-top: 15px; max-height: 400px; overflow-y: auto">
+                    <table id="tabelaPerfis" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%">Nome</th>
+                                <th style="width: 20%">Matrícula</th>
+                                <th style="width: 15%">Perfil</th>
+                                <th style="width: 30%">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO -->
+    <div id="modalConfirmacao" class="modal-overlay" style="z-index: 1001">
+        <div class="modal-box" style="width: 350px; text-align: center">
+            <h3>Confirmar Exclusão</h3>
+            <p style="margin: 20px 0; color: #64748b">
+                Tem certeza que deseja remover este perfil? Esta ação não pode ser
+                desfeita.
+            </p>
+            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: center">
+                <button id="btnCancelarConfirmacao" class="btn-cancel">
+                    Cancelar
+                </button>
+                <button id="btnExecutarConfirmacao" class="btn-delete">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/modal-ativo.js"></script>
+
+    <script>
+        // Ajuste de logout redirecionar corretamente
+        const oldLogout = window.logout; // dashboard.js deve ter criado isso ou anexado
+        // Precisamos sobrescrever o logout para voltar para o login (mesma pasta agora)
+        function logout(e) {
+            if (e) e.preventDefault();
+            localStorage.removeItem("usuario");
+            window.location.href = "index.html";
+        }
+        // Re-attach
+        document.getElementById("btnSair")?.addEventListener("click", logout);
+    </script>
+</body>
+
+</html>
