@@ -119,6 +119,30 @@ export async function listarTiposAtivo(req: Request, res: Response) {
   }
 }
 
+// function criarTipo: Cria um novo Tipo de Ativo
+export async function criarTipo(req: Request, res: Response) {
+  try {
+    const { descricao } = req.body;
+    const novo = await ativoService.criarTipoAtivo(descricao);
+    res.status(201).json(novo);
+  } catch (error: any) {
+    console.error("Erro ao criar tipo:", error);
+    res.status(500).json({ message: "Erro ao criar tipo de ativo" });
+  }
+}
+
+// function criarLocalizacao: Cria uma nova Localização
+export async function criarLocalizacao(req: Request, res: Response) {
+  try {
+    const { nome } = req.body;
+    const novo = await ativoService.criarLocalizacao(nome);
+    res.status(201).json(novo);
+  } catch (error: any) {
+    console.error("Erro ao criar localização:", error);
+    res.status(500).json({ message: "Erro ao criar localização" });
+  }
+}
+
 // function listarHistorico: Obtém o histórico específico de UM ativo.
 // Recebe o ID do ativo na URL e retorna todas as alterações daquele item.
 export async function listarHistorico(req: Request, res: Response) {

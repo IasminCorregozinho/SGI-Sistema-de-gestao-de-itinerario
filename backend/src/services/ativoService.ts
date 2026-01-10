@@ -72,6 +72,30 @@ export async function atualizarAtivo(
   // Merge dos dados antigos com os novos (PATCH strategy)
   const ativoFinal = { ...ativoAntigo, ...dadosNovos };
 
+  // Generate detailed change log for fields not tracked by specific columns
+  const changes: string[] = [];
+
+  if (dadosNovos.patrimonio && dadosNovos.patrimonio !== ativoAntigo.patrimonio) {
+    changes.push(`Patrimônio: ${ativoAntigo.patrimonio} -> ${dadosNovos.patrimonio}`);
+  }
+  if (dadosNovos.marca_modelo && dadosNovos.marca_modelo !== ativoAntigo.marca_modelo) {
+    changes.push(`Marca/Modelo: ${ativoAntigo.marca_modelo || ''} -> ${dadosNovos.marca_modelo}`);
+  }
+  if (dadosNovos.numero_serie && dadosNovos.numero_serie !== ativoAntigo.numero_serie) {
+    changes.push(`Nº Série: ${ativoAntigo.numero_serie || ''} -> ${dadosNovos.numero_serie}`);
+  }
+  if (dadosNovos.tipo_armazenamento && dadosNovos.tipo_armazenamento !== ativoAntigo.tipo_armazenamento) {
+    changes.push(`Armazenamento: ${ativoAntigo.tipo_armazenamento || ''} -> ${dadosNovos.tipo_armazenamento}`);
+  }
+  if (dadosNovos.capacidade_armazenamento && dadosNovos.capacidade_armazenamento !== ativoAntigo.capacidade_armazenamento) {
+    changes.push(`Capacidade: ${ativoAntigo.capacidade_armazenamento || ''} -> ${dadosNovos.capacidade_armazenamento}`);
+  }
+
+  // Combine user observation with system generated changes
+  const userObs = dadosNovos.obs || (dadosNovos as any).observacao || "";
+  const systemChanges = changes.length > 0 ? changes.join(', ') : "";
+  const finalObs = userObs.trim(); // Only user observation
+
   // Registra no histórico comparando o "Antigo" com o "Final"
   await ativoRepo.registrarHistorico({
     ativo_id: id,
@@ -82,7 +106,8 @@ export async function atualizarAtivo(
     localizacao_novo: ativoFinal.id_localizacao,
     responsavel_anterior: ativoAntigo.id_responsavel,
     responsavel_novo: ativoFinal.id_responsavel,
-    observacao: dadosNovos.obs || "Edição de cadastro",
+    observacao: finalObs,
+    dados_alteracao: systemChanges || undefined,
     valor_manutencao: dadosNovos.valor_manutencao,
   });
 
@@ -135,6 +160,16 @@ export async function listarLocalizacoes() {
 
 export async function listarTiposAtivo() {
   return await ativoRepo.buscarTiposAtivo();
+}
+
+export async function criarTipoAtivo(descricao: string) {
+  if (!descricao) throw new Error("Descrição é obrigatória.");
+  return await ativoRepo.criarTipoAtivo(descricao);
+}
+
+export async function criarLocalizacao(nome: string) {
+  if (!nome) throw new Error("Nome da localização é obrigatório.");
+  return await ativoRepo.criarLocalizacao(nome);
 }
 
 /**

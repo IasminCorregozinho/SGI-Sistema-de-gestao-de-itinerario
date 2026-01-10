@@ -60,6 +60,11 @@ export async function buscarTodos(): Promise<Ativo[]> {
         LEFT JOIN TIPO_ATIVO t ON a.tipo_ativo = t.tipo_ativo_id
         LEFT JOIN localizacao_ativo l ON a.localizacao = l.localizacao_id
         LEFT JOIN RESPONSAVEL r ON a.responsavel = r.responsavel_id
+        ORDER BY (
+            SELECT MAX(data_movimentacao) 
+            FROM historico_ativo h 
+            WHERE h.ativo_id = a.ativo_id
+        ) DESC NULLS LAST, a.ativo_id DESC
     `;
   const result = await pool.query(query);
 
@@ -140,8 +145,8 @@ export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
             ativo_id, data_movimentacao, usuario_alteracao, 
             status_anterior, status_novo,
             localizacao_anterior, localizacao_novo,
-            responsavel_anterior, responsavel_novo, observacao, valor_manutencao
-        ) VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            responsavel_anterior, responsavel_novo, observacao, valor_manutencao, dados_alteracao
+        ) VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     `;
   await pool.query(query, [
     hist.ativo_id,
@@ -154,6 +159,7 @@ export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
     hist.responsavel_novo,
     hist.observacao,
     hist.valor_manutencao || null,
+    hist.dados_alteracao || null,
   ]);
 }
 
@@ -195,16 +201,13 @@ export async function obterContagemPorCategoria() {
 export async function obterMovimentacoesRecentes() {
   const query = `
         SELECT 
-            a.patrimonio as ativo,      
+            COALESCE(t.descricao, '') || ' ' || COALESCE(a.marca_modelo, '') as ativo_nome,      
             r.nome as usuario,
-            CASE 
-                WHEN h.status_anterior IS NULL THEN 'Cadastro'
-                WHEN h.status_novo = h.status_anterior THEN 'Edição'
-                ELSE s.descricao 
-            END as acao,       
+            s.descricao as status_nome,       
             h.data_movimentacao as data
         FROM historico_ativo h
         INNER JOIN ATIVO a ON h.ativo_id = a.ativo_id
+        LEFT JOIN TIPO_ATIVO t ON a.tipo_ativo = t.tipo_ativo_id
         INNER JOIN STATUS_ATIVO s ON h.status_novo = s.status_id
         LEFT JOIN RESPONSAVEL r ON h.usuario_alteracao = r.responsavel_id
         ORDER BY h.data_movimentacao DESC
@@ -241,6 +244,24 @@ export async function buscarTiposAtivo() {
   return result.rows; // { tipo_ativo_id, descricao }
 }
 
+// Criar novo Tipo de Ativo
+export async function criarTipoAtivo(descricao: string): Promise<any> {
+  const result = await pool.query(
+    "INSERT INTO TIPO_ATIVO (descricao) VALUES ($1) RETURNING *",
+    [descricao]
+  );
+  return result.rows[0];
+}
+
+// Criar nova Localização
+export async function criarLocalizacao(nome: string): Promise<any> {
+  const result = await pool.query(
+    "INSERT INTO localizacao_ativo (setor_sala) VALUES ($1) RETURNING *",
+    [nome]
+  );
+  return result.rows[0];
+}
+
 // Buscar histórico de um ativo
 export async function buscarHistoricoPorAtivoId(id: number) {
   const query = `
@@ -265,7 +286,8 @@ export async function buscarHistoricoPorAtivoId(id: number) {
             COALESCE(l2.setor_sala, l2.reitoria, 'Sem Local') as localizacao_novo_nome,
             r_ant.nome as responsavel_anterior_nome,
             r_nov.nome as responsavel_novo_nome,
-            h.valor_manutencao
+            h.valor_manutencao,
+            h.dados_alteracao
         FROM historico_ativo h
         LEFT JOIN RESPONSAVEL r ON h.usuario_alteracao = r.responsavel_id
         LEFT JOIN STATUS_ATIVO s1 ON h.status_anterior = s1.status_id
