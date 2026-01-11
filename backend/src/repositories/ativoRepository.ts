@@ -18,10 +18,11 @@ export async function buscarPorId(id: number): Promise<Ativo | null> {
       id_localizacao: row.localizacao,
       id_responsavel: row.responsavel,
       marca_modelo: row.marca_modelo,
-      numero_serie: row.numero_serie, // Mapeando
+      numero_serie: row.numero_serie,
       obs: row.observacoes,
       tipo_armazenamento: row.tipo_armazenamento,
       capacidade_armazenamento: row.capacidade_armazenamento,
+      valor_manutencao: row.valor_manutencao,
     } as Ativo;
   }
   return null;
@@ -40,7 +41,7 @@ export async function buscarPorPatrimonio(
     return {
       id: row.ativo_id,
       patrimonio: row.patrimonio,
-      numero_serie: row.numero_serie, // Mapeando
+      numero_serie: row.numero_serie,
     } as Ativo;
   }
   return null;
@@ -78,11 +79,11 @@ export async function buscarTodos(): Promise<Ativo[]> {
       id_localizacao: row.localizacao,
       id_responsavel: row.responsavel,
       marca_modelo: row.marca_modelo,
-      numero_serie: row.numero_serie, // Mapeando
+      numero_serie: row.numero_serie,
       obs: row.observacoes,
       tipo_armazenamento: row.tipo_armazenamento,
       capacidade_armazenamento: row.capacidade_armazenamento,
-      // Campos extras
+      valor_manutencao: row.valor_manutencao,
       status_nome: row.status_nome,
       tipo_ativo_nome: row.tipo_ativo_nome,
       localizacao_nome: row.localizacao_nome,
@@ -94,8 +95,8 @@ export async function buscarTodos(): Promise<Ativo[]> {
 // Criar novo ativo
 export async function criar(ativo: Ativo): Promise<Ativo> {
   const query = `
-        INSERT INTO ATIVO (patrimonio, tipo_ativo, status, localizacao, responsavel, marca_modelo, numero_serie, observacoes, tipo_armazenamento, capacidade_armazenamento) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+        INSERT INTO ATIVO (patrimonio, tipo_ativo, status, localizacao, responsavel, marca_modelo, numero_serie, observacoes, tipo_armazenamento, capacidade_armazenamento, valor_manutencao) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
     `;
   const values = [
     ativo.patrimonio,
@@ -104,10 +105,11 @@ export async function criar(ativo: Ativo): Promise<Ativo> {
     ativo.id_localizacao,
     ativo.id_responsavel,
     ativo.marca_modelo,
-    ativo.numero_serie, // Novo valor
+    ativo.numero_serie,
     ativo.obs,
     ativo.tipo_armazenamento,
     ativo.capacidade_armazenamento,
+    ativo.valor_manutencao,
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -118,8 +120,8 @@ export async function atualizar(id: number, ativo: Ativo): Promise<Ativo> {
   const query = `
         UPDATE ATIVO SET 
             tipo_ativo = $1, status = $2, localizacao = $3, responsavel = $4, patrimonio = $5, marca_modelo = $6, numero_serie = $7, observacoes = $8,
-            tipo_armazenamento = $9, capacidade_armazenamento = $10
-        WHERE ativo_id = $11 RETURNING *
+            tipo_armazenamento = $9, capacidade_armazenamento = $10, valor_manutencao = $11
+        WHERE ativo_id = $12 RETURNING *
     `;
   const values = [
     ativo.id_tipo_ativo,
@@ -128,10 +130,11 @@ export async function atualizar(id: number, ativo: Ativo): Promise<Ativo> {
     ativo.id_responsavel,
     ativo.patrimonio,
     ativo.marca_modelo,
-    ativo.numero_serie, // Novo valor
+    ativo.numero_serie,
     ativo.obs,
     ativo.tipo_armazenamento,
     ativo.capacidade_armazenamento,
+    ativo.valor_manutencao,
     id,
   ];
   const result = await pool.query(query, values);

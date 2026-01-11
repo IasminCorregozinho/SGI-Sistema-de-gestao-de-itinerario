@@ -1,4 +1,3 @@
-// User Model
 // * Define a estrutura de dados e as operações de banco de dados para Usuários.
 
 import { pool } from "../config/db";

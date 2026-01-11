@@ -12,7 +12,6 @@
   --transition-speed: 0.3s;
 }
 
-/* Global Scrollbar Standardization */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -24,13 +23,11 @@
 
 ::-webkit-scrollbar-thumb {
   background: #cccccc;
-  /* Light Gray */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #b3b3b3;
-  /* Slightly darker on hover */
 }
 
 * {
@@ -76,9 +73,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at top left,
+  background: radial-gradient(
+      circle at top left,
       rgba(255, 255, 255, 0.1),
-      transparent),
+      transparent
+    ),
     linear-gradient(135deg, rgba(0, 0, 0, 0.2), transparent);
   z-index: 1;
 }
@@ -115,7 +114,6 @@ body {
 .logo-placeholder {
   width: 100%;
   max-width: 230px;
-  /* Aumentado de 200px para 230px */
   height: auto;
   margin-bottom: 1rem;
   background: transparent;
