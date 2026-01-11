@@ -1,4 +1,3 @@
-// Ativo Controller
 // * * Este arquivo é responsável por gerenciar as requisições HTTP relacionadas aos Ativos de TI.
 // * Ele atua como uma ponte entre o Frontend (Cliente) e a Camada de Serviço (Regra de Negócio).
 
@@ -7,7 +6,6 @@ import * as ativoService from "../services/ativoService";
 
 // function criar: cria um novo ativo no sistema, recebe os dados do corpo da requisição (JSON),
 // chama o serviço de cadastro e retorna o ativo criado com status 201 (Created).
-
 export async function criar(req: Request, res: Response) {
   try {
     const usuarioId = parseInt(req.headers["x-user-id"] as string) || 1;
@@ -21,7 +19,6 @@ export async function criar(req: Request, res: Response) {
     return res.status(500).json({ error: error.message });
   }
 }
-
 // function editar: atualiza os dados de um ativo existente
 // Busca o ativo pelo ID passado na URL e atualiza com os dados do corpo da requisição.
 export async function editar(req: Request, res: Response) {
@@ -44,7 +41,6 @@ export async function editar(req: Request, res: Response) {
     return res.status(500).json({ error: error.message });
   }
 }
-
 // function listar: lista todos os ativos cadastrados no sistema.
 // Utilizado para popular a tabela principal de listagem.
 export async function listar(req: Request, res: Response) {
@@ -58,7 +54,6 @@ export async function listar(req: Request, res: Response) {
     return res.status(500).json({ error: error.message });
   }
 }
-
 // function obterDadosDashboard: obtém os dados consolidados para a visualização do dashboard (KPIs e Gráficos).
 export async function obterDadosDashboard(req: Request, res: Response) {
   try {
@@ -81,7 +76,6 @@ export async function obterMovimentacoes(req: Request, res: Response) {
     res.status(500).json({ message: "Erro interno ao buscar histórico" });
   }
 }
-
 // function listarStatus:Lista todas as opções de Status disponíveis no banco.
 // é usado para preencher os Selecione... (dropdowns) no formulário de cadastro, filtro e edição
 

@@ -1,4 +1,3 @@
-// modal-ativo.js
 const ModalAtivo = {
   editingId: null, // Armazena o ID do ativo sendo editado
 
@@ -12,7 +11,8 @@ const ModalAtivo = {
         <div id="modalCadastro" class="modal-overlay">
             <div class="modal-box">
                 <span class="close-btn" id="fecharModalCadastro">&times;</span>
-                <h2 id="modalTitle">Cadastrar Novo Ativo</h2>
+                <h2 id="modalTitle" style="margin-bottom: 15px;">Cadastrar Novo Ativo</h2>
+                <p id="modalSubtitle" style="text-align: center; color: var(--text-secondary); margin-bottom: 25px; font-size: 1.1rem; display: none;"></p>
 
                 <div id="msgCadastro"
                     style="display: none; padding: 8px 16px; margin: 10px auto; border-radius: 20px; text-align: center; font-weight: 500; width: fit-content; max-width: 90%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -20,8 +20,8 @@ const ModalAtivo = {
 
                 <form id="formAtivo">
                     <div class="form-group">
-                        <label>Nº Patrimônio</label>
-                        <input type="text" id="patrimonio" placeholder="Ex: COMP-001" required>
+                        <label>Número de Patrimônio</label>
+                        <input type="text" id="patrimonio" placeholder="Ex: DSK-001" required>
                     </div>
 
                     <div class="form-group">
@@ -36,12 +36,12 @@ const ModalAtivo = {
 
                     <div class="form-group">
                         <label>Marca / Modelo</label>
-                        <input type="text" id="marca_modelo" placeholder="Ex: Dell Inspiron">
+                        <input type="text" id="marca_modelo" placeholder="Ex: Notebook Dell Inspiron">
                     </div>
 
                     <div class="form-group">
                         <label>Número de Série</label>
-                        <input type="text" id="numero_serie" placeholder="Ex: SN12345678">
+                        <input type="text" id="numero_serie" placeholder="Ex: NS12345678">
                     </div>
 
                     <!-- Grupo de Armazenamento (Dinâmico para Desktop/Notebook) -->
@@ -262,6 +262,25 @@ const ModalAtivo = {
         this.resetForm();
       });
     }
+
+    // Fechar com ESC (Adicionado)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (
+          document.getElementById("modalCadastroRapido") &&
+          document.getElementById("modalCadastroRapido").style.display === "flex"
+        ) {
+          // Fecha modal rápido primeiro se estiver aberto
+          document.getElementById("modalCadastroRapido").style.display = "none";
+          return;
+        }
+
+        if (modal && modal.style.display === "flex") {
+          modal.style.display = "none";
+          this.resetForm();
+        }
+      }
+    });
     // Submissão do formulário
     if (form) {
       form.addEventListener("submit", (e) => this.salvarAtivo(e));
@@ -391,6 +410,11 @@ const ModalAtivo = {
     document.getElementById("msgCadastro").style.display = "none";
     const title = document.getElementById("modalTitle");
     if (title) title.innerText = "Cadastrar Novo Ativo";
+    const sub = document.getElementById("modalSubtitle");
+    if (sub) {
+      sub.innerText = "";
+      sub.style.display = "none";
+    }
 
     // Habilita campo patrimônio caso esteja desabilitado
     const patInput = document.getElementById("patrimonio");
@@ -426,7 +450,6 @@ const ModalAtivo = {
           respSelect.disabled = true;
 
           // Adiciona um input hidden para garantir que o valor seja enviado no submit (se necessario)
-          // Mas como estamos pegando via .value do elemento disabled, o JS pega normal.
         } else {
           respSelect.disabled = false;
         }
@@ -448,7 +471,7 @@ const ModalAtivo = {
       patrimonio: ativo.patrimonio,
       id_tipo_ativo: ativo.id_tipo_ativo,
       marca_modelo: ativo.marca_modelo,
-      numero_serie: ativo.numero_serie, // Novo snapshot
+      numero_serie: ativo.numero_serie,
       id_status: ativo.id_status,
       id_localizacao: ativo.id_localizacao,
       id_responsavel: ativo.id_responsavel,
@@ -480,27 +503,35 @@ const ModalAtivo = {
     if (document.getElementById("observacoes"))
       document.getElementById("observacoes").value = ativo.obs;
 
-    // Formatar valor da manutenção se existir
-    if (document.getElementById("valor_manutencao") && ativo.valor_manutencao) {
-      const valor = parseFloat(ativo.valor_manutencao)
-        .toFixed(2)
-        .replace(".", ",");
-      document.getElementById("valor_manutencao").value = `R$ ${valor} `;
-    } else {
-      if (document.getElementById("valor_manutencao"))
-        document.getElementById("valor_manutencao").value = "";
-    }
-
     // Atualiza Título
     const title = document.getElementById("modalTitle");
-    if (title) title.innerText = `Editar Ativo: ${ativo.patrimonio} `;
+    if (title) title.innerText = "Editar Ativo";
+
+    const sub = document.getElementById("modalSubtitle");
+    if (sub) {
+      sub.innerHTML = `<strong>${ativo.marca_modelo || "Ativo sem Nome"}</strong> (Patrimônio: ${ativo.patrimonio})`;
+      sub.style.display = "block";
+    }
 
     // Abre modal
     const modal = document.getElementById("modalCadastro");
     if (modal) {
       modal.style.display = "flex";
-      modal.style.display = "flex";
       this.verificarStatusManutencao(); // Garante que campos condicionais apareçam
+
+      // Formatar valor da manutenção se existir
+      if (
+        document.getElementById("valor_manutencao") &&
+        ativo.valor_manutencao
+      ) {
+        const valor = parseFloat(ativo.valor_manutencao)
+          .toFixed(2)
+          .replace(".", ",");
+        document.getElementById("valor_manutencao").value = `R$ ${valor} `;
+      } else {
+        if (document.getElementById("valor_manutencao"))
+          document.getElementById("valor_manutencao").value = "";
+      }
 
       // Preencher campos de armazenamento se existirem e o tipo for compatível
       // Primeiro chama a verificação para exibir o container se for PC
@@ -602,8 +633,8 @@ const ModalAtivo = {
     const div = document.getElementById(divId);
     div.style.display = "block";
     div.textContent = texto;
-    div.style.backgroundColor = isErro ? "#fee2e2" : "#d1fae5"; // Match dashboard colors exactly (#fee2e2 vs #f8d7da)
-    div.style.color = isErro ? "#991b1b" : "#065f46"; // Corresponder cores do dashboard (#991b1b vs #721c24)
+    div.style.backgroundColor = isErro ? "#fee2e2" : "#d1fae5"; // Corresponde as cores do dashboard (#fee2e2 vs #f8d7da)
+    div.style.color = isErro ? "#991b1b" : "#065f46"; // Corresponde as cores do dashboard (#991b1b vs #721c24)
     div.style.border = "none"; // Remover explicitamente a borda
 
     if (!isErro) {
@@ -766,7 +797,7 @@ const ModalAtivo = {
           }
           if (btnClose) btnClose.style.pointerEvents = "auto";
 
-          // Recarrega lsita
+          // Recarrega lista
           if (typeof carregarAtivos === "function") {
             carregarAtivos();
             const msgGlobal = document.getElementById("divMensagemSistema");
@@ -815,7 +846,6 @@ const ModalAtivo = {
   },
 
   // === FUNCIONALIDADE DE CADASTRO RÁPIDO ===
-
   // Variáveis de controle do Cadastro Rápido
   tipoCadastroRapido: null, // "tipo" ou "localizacao"
 
@@ -864,7 +894,7 @@ const ModalAtivo = {
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [bodyKey]: nome })
+        body: JSON.stringify({ [bodyKey]: nome }),
       });
 
       if (response.ok) {
@@ -882,24 +912,35 @@ const ModalAtivo = {
             select.value = novo.tipo_ativo_id;
             this.verificarTipoAtivo();
           }
-          this.mostrarMensagem("msgCadastro", "Tipo de Ativo criado com sucesso!", false);
-
+          this.mostrarMensagem(
+            "msgCadastro",
+            "Tipo de Ativo criado com sucesso!",
+            false
+          );
         } else {
           // Recarrega Localizações
           const resLista = await fetch("/ativos/localizacoes");
           const lista = await resLista.json();
-          this.popularSelect("localizacao", lista, "localizacao_id", "setor_sala");
+          this.popularSelect(
+            "localizacao",
+            lista,
+            "localizacao_id",
+            "setor_sala"
+          );
 
           // Seleciona novo
           const select = document.getElementById("localizacao");
           if (select) {
             select.value = novo.localizacao_id;
           }
-          this.mostrarMensagem("msgCadastro", "Localização criada com sucesso!", false);
+          this.mostrarMensagem(
+            "msgCadastro",
+            "Localização criada com sucesso!",
+            false
+          );
         }
 
         this.fecharModalCadastroRapido();
-
       } else {
         alert("Erro ao criar item. Verifique se já existe.");
       }
@@ -926,48 +967,54 @@ if (document.readyState === "loading") {
     const btnSave = document.getElementById("btnSalvarRapido");
     const btnCancel = document.getElementById("btnCancelarRapido");
 
-    if (btnSave) btnSave.addEventListener("click", (e) => {
-      e.preventDefault();
-      ModalAtivo.salvarCadastroRapido();
-    });
+    if (btnSave)
+      btnSave.addEventListener("click", (e) => {
+        e.preventDefault();
+        ModalAtivo.salvarCadastroRapido();
+      });
 
-    if (btnCancel) btnCancel.addEventListener("click", (e) => {
-      e.preventDefault();
-      ModalAtivo.fecharModalCadastroRapido();
-    });
+    if (btnCancel)
+      btnCancel.addEventListener("click", (e) => {
+        e.preventDefault();
+        ModalAtivo.fecharModalCadastroRapido();
+      });
 
     // Suporte a tecla Enter para Cadastro Rapido
     const inputQuick = document.getElementById("inputCadastroRapido");
-    if (inputQuick) inputQuick.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        ModalAtivo.salvarCadastroRapido();
-      }
-    });
+    if (inputQuick)
+      inputQuick.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          ModalAtivo.salvarCadastroRapido();
+        }
+      });
   });
 } else {
   ModalAtivo.init();
-  // Setup extra listeners immediately if loaded
+  // Configura extra listeners imediatamente se estiverem carregados
   setTimeout(() => {
     const btnSave = document.getElementById("btnSalvarRapido");
     const btnCancel = document.getElementById("btnCancelarRapido");
 
-    if (btnSave) btnSave.addEventListener("click", (e) => {
-      e.preventDefault();
-      ModalAtivo.salvarCadastroRapido();
-    });
-
-    if (btnCancel) btnCancel.addEventListener("click", (e) => {
-      e.preventDefault();
-      ModalAtivo.fecharModalCadastroRapido();
-    });
-
-    const inputQuick = document.getElementById("inputCadastroRapido");
-    if (inputQuick) inputQuick.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
+    if (btnSave)
+      btnSave.addEventListener("click", (e) => {
         e.preventDefault();
         ModalAtivo.salvarCadastroRapido();
-      }
-    });
+      });
+
+    if (btnCancel)
+      btnCancel.addEventListener("click", (e) => {
+        e.preventDefault();
+        ModalAtivo.fecharModalCadastroRapido();
+      });
+
+    const inputQuick = document.getElementById("inputCadastroRapido");
+    if (inputQuick)
+      inputQuick.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          ModalAtivo.salvarCadastroRapido();
+        }
+      });
   }, 100);
 }

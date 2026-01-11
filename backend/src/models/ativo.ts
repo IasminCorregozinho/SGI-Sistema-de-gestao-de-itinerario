@@ -13,7 +13,7 @@ export interface Ativo {
   id_localizacao: number;
   id_responsavel: number;
   marca_modelo?: string;
-  numero_serie?: string; // Novo campo
+  numero_serie?: string;
   data_aquisicao?: Date;
   info_tecnicas?: string;
   obs?: string;
@@ -30,7 +30,7 @@ export interface Ativo {
   capacidade_armazenamento?: string;
 }
 
-// interface para o Histórico
+// Interface para o Histórico
 export interface HistoricoAtivo {
   ativo_id: number;
   usuario_alteracao: number;

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- SIDEBAR TOGGLE ---
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("sidebarToggle");
     const topScroll = document.getElementById("topScrollContainer");
@@ -90,6 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Fechar com ESC (Histórico)
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            const modalHist = document.getElementById("modalHistorico");
+            if (modalHist && modalHist.style.display === "flex") {
+                modalHist.style.display = "none";
+            }
+        }
+    });
+
     // Logout
     document.getElementById("btnSair")?.addEventListener("click", (e) => {
         e.preventDefault();
@@ -116,11 +125,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Inicialização
     verificarLogin();
-    carregarFiltros(); // Renamed internally to match logic but function exists
+    carregarFiltros();
     carregarAtivos();
 
     // --- Funções Auxiliares ---
-
     function verificarLogin() {
         const userStr = localStorage.getItem("usuario");
         if (!userStr) {
@@ -128,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // function carregarAtivos: Busca a lista completa de ativos no backend.
     // function carregarAtivos: Busca a lista completa de ativos no backend.
     async function carregarAtivos() {
         const divMsg = document.getElementById("divMensagemSistema");
@@ -364,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `"${a.status_nome || ""}"`,
                 `"${a.localizacao_nome || ""}"`,
                 `"${a.responsavel_nome || ""}"`,
-                `"${(a.observacao || "").replace(/"/g, '""')}"`,
+                `"${(a.obs || "").replace(/"/g, '""')}"`,
             ];
             csv += linha.join(";") + "\n";
         });
@@ -396,7 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fechar modal ao clicar fora
     // window.onclick removido para evitar fechamento ao clicar fora
-
     window.abrirHistorico = async function (idAtivo) {
         // Encontra dados do ativo para o título (opcional, mas bom ter)
         const ativo = todosAtivos.find(a => a.id === idAtivo || a.id === String(idAtivo));
@@ -430,8 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     tbody.appendChild(spacerRow);
 
                     if (historico.length === 0) {
-                        tbody.innerHTML =
-                            '<tr><td colspan="4" style="text-align:center;">Nenhum histórico encontrado.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #64748b;">Nenhum histórico encontrado.</td></tr>';
                         return;
                     }
 
@@ -454,7 +459,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     };
 
                     historico.forEach((h) => {
-                        // ... (omitted logic for brevity, keep as is) ...
                         let alteracoes = [];
 
                         if (h.dados_alteracao) {
@@ -479,12 +483,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (h.localizacao_anterior_nome && h.localizacao_novo_nome && h.localizacao_anterior_nome !== h.localizacao_novo_nome) alteracoes.push(createItem("Local", h.localizacao_anterior_nome, h.localizacao_novo_nome));
                             if (h.responsavel_anterior_nome && h.responsavel_novo_nome && h.responsavel_anterior_nome !== h.responsavel_novo_nome) alteracoes.push(createItem("Resp", h.responsavel_anterior_nome, h.responsavel_novo_nome));
                         }
-
                         if (h.valor_manutencao) {
                             const vf = parseFloat(h.valor_manutencao).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
                             alteracoes.push(createItem("Custo", null, vf, true));
                         }
-
                         let conteudoAlteracoes = alteracoes.join("");
                         if (!conteudoAlteracoes) {
                             if (h.tipo_acao === "Cadastro") {
@@ -493,7 +495,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 conteudoAlteracoes = `<span style="color:#94a3b8; font-style:italic; font-size:13px;">Detalhes não registrados.</span>`;
                             }
                         }
-
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
                             <td style="vertical-align:top; color:#64748b; white-space:nowrap; font-size: 13px; padding: 12px 14px;">${new Date(h.data_movimentacao).toLocaleDateString("pt-BR")}</td>
@@ -504,8 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <td style="vertical-align:top; padding: 12px 14px;">
                                 <div style="display:flex; flex-direction:column; gap:2px;">${conteudoAlteracoes}</div>
                                 ${h.observacao && !h.observacao.includes("[Alt:") ? `<div style="margin-top:6px; font-size:12px; color:#475569; background:#f8fafc; padding:4px 8px; border-radius:4px; border-left:2px solid #cbd5e1;"><strong>Obs:</strong> ${h.observacao}</div>` : ""}
-                            </td>
-                        `;
+                            </td>`;
                         tbody.appendChild(tr);
                     });
                 } else {

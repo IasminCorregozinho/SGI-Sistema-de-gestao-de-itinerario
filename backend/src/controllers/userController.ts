@@ -1,4 +1,3 @@
-// User Controller
 // * Este arquivo gerencia as requisições HTTP relacionadas aos Usuários e Perfis.
 // * Ele atua como ponte entre o Frontend e o Serviço de Usuários.
 
@@ -38,12 +37,9 @@ export async function criarPerfil(req: Request, res: Response) {
   try {
     const { nome, matricula, senha, perfil_id } = req.body;
     if (!matricula || !nome || !senha) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Matrícula, nome e senha são obrigatórios para criar um perfil",
-        });
+      return res.status(400).json({
+        error: "Matrícula, nome e senha são obrigatórios para criar um perfil",
+      });
     }
     const profile = await userService.criarPerfil(
       nome,
@@ -77,12 +73,10 @@ export async function atualizarPerfil(req: Request, res: Response) {
       id,
       dadosAtualizacao
     );
-    return res
-      .status(200)
-      .json({
-        message: "Perfil atualizado com sucesso",
-        profile: updatedProfile,
-      });
+    return res.status(200).json({
+      message: "Perfil atualizado com sucesso",
+      profile: updatedProfile,
+    });
   } catch (error: any) {
     if (error.message === "Perfil não encontrado") {
       return res.status(404).json({ error: error.message });
