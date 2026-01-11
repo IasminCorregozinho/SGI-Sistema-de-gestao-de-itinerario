@@ -21,6 +21,12 @@ export async function cadastrarAtivo(dados: Ativo, usuarioId: number = 1) {
   if (existente) {
     throw new Error(`Patrimônio ${dados.patrimonio} já está cadastrado.`);
   }
+
+  // Mapear "observacao" (frontend) para "obs" (banco/modelo)
+  if ((dados as any).observacao && !dados.obs) {
+    dados.obs = (dados as any).observacao;
+  }
+
   // Salva o novo ativo na tabela principal
   const novoAtivo = await ativoRepo.criar(dados);
 
@@ -69,10 +75,15 @@ export async function atualizarAtivo(
     throw new Error("Ativo não encontrado");
   }
 
-  // Merge dos dados antigos com os novos (PATCH strategy)
+  // Merge dos dados antigos com os novos (estrategia PATCH)
+  // Normalizar observacao -> obs
+  if ((dadosNovos as any).observacao && !dadosNovos.obs) {
+    dadosNovos.obs = (dadosNovos as any).observacao;
+  }
+
   const ativoFinal = { ...ativoAntigo, ...dadosNovos };
 
-  // Generate detailed change log for fields not tracked by specific columns
+  // Gera um registro de alterações detalhado para campos não rastreados por colunas específicas
   const changes: string[] = [];
 
   if (dadosNovos.patrimonio && dadosNovos.patrimonio !== ativoAntigo.patrimonio) {
@@ -91,10 +102,10 @@ export async function atualizarAtivo(
     changes.push(`Capacidade: ${ativoAntigo.capacidade_armazenamento || ''} -> ${dadosNovos.capacidade_armazenamento}`);
   }
 
-  // Combine user observation with system generated changes
+  // Combinar a observação do usuário com as alterações geradas pelo sistema
   const userObs = dadosNovos.obs || (dadosNovos as any).observacao || "";
   const systemChanges = changes.length > 0 ? changes.join(', ') : "";
-  const finalObs = userObs.trim(); // Only user observation
+  const finalObs = userObs.trim();
 
   // Registra no histórico comparando o "Antigo" com o "Final"
   await ativoRepo.registrarHistorico({
@@ -133,9 +144,8 @@ export async function obterDadosDashboard() {
   };
 }
 
-/**
- * Retorna as últimas movimentações registradas no sistema (Log de atividades).
- */
+// * Retorna as últimas movimentações registradas no sistema (Log de atividades).
+
 export async function obterMovimentacoesRecentes() {
   return await ativoRepo.obterMovimentacoesRecentes();
 }
@@ -147,16 +157,13 @@ export async function listarStatus() {
   return await ativoRepo.buscarStatus();
 }
 
-/**
- * Retorna a lista de localizações cadastradas.
- */
+// * Retorna a lista de localizações cadastradas.
+
 export async function listarLocalizacoes() {
   return await ativoRepo.buscarLocalizacoes();
 }
 
-/**
- * Retorna a lista de tipos de ativo (ex: Notebook, Monitor, Teclado).
- */
+// * Retorna a lista de tipos de ativo (ex: Notebook, Monitor, Teclado).
 
 export async function listarTiposAtivo() {
   return await ativoRepo.buscarTiposAtivo();

@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 
-// Garante que o .env da raiz seja lido corretamente
+// Leitura do .env no path correto
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 console.log("[AGUARDE...] Tentando conectar ao banco:", {
