@@ -205,7 +205,7 @@ header p {
   color: var(--text-primary);
 }
 
-/* --- Estilos Específicos da Listagem de Ativos (da tag <style> original) --- */
+/* --- Estilos Específicos da Listagem de Ativos --- */
 .filter-section {
   background: white;
   padding: 20px;
@@ -282,7 +282,6 @@ header p {
   height: 8px;
 }
 
-/* Custom Scrollbar Styling */
 .table-container::-webkit-scrollbar {
   height: 8px;
 }
@@ -294,16 +293,13 @@ header p {
 
 .table-container::-webkit-scrollbar-thumb {
   background: #cccccc;
-  /* Match Global Light Gray */
   border-radius: 4px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
   background: #b3b3b3;
-  /* Match Global Hover */
 }
 
-/* Hide Bottom Scrollbar */
 #mainTableContainer::-webkit-scrollbar {
   display: none;
 }
@@ -361,33 +357,26 @@ tbody tr:hover {
 
 tbody tr:nth-child(even) {
   background-color: #fcfcfc;
-  /* Very subtle gray/white distinction */
 }
 
-/* History Modal Specific Striping (Accounts for Spacer Row) */
 #tbodyHistorico tr:nth-child(even) {
   background-color: transparent;
-  /* Reset even (Data 1) to white */
 }
 
 #tbodyHistorico tr:nth-child(odd) {
   background-color: #fcfcfc;
-  /* Set odd (Data 2) to gray */
 }
 
 #tbodyHistorico tr:first-child {
   background-color: transparent !important;
-  /* Force spacer (Odd) to be transparent */
 }
 
-/* Spacing between header and first row */
 tbody::before {
   content: "";
   display: block;
   height: 15px;
 }
 
-/* Fixed Column Widths (Pixels) - Optimized */
 #tabelaAtivos th:nth-child(1) {
   width: 110px;
 }
@@ -409,12 +398,12 @@ tbody::before {
 
 /* Serie */
 #tabelaAtivos th:nth-child(5) {
-  width: 110px;
+  width: 140px;
 }
 
 /* Tipo Arm */
 #tabelaAtivos th:nth-child(6) {
-  width: 110px;
+  width: 160px;
 }
 
 /* Capacidade */
@@ -470,13 +459,15 @@ tbody::before {
 }
 
 .btn-acao-editar {
-  background-color: var(--ifg-green);
-  color: white;
-  box-shadow: 0 2px 4px rgba(48, 147, 60, 0.2);
+  background-color: #dbeafe;
+  color: #1e40af;
+  box-shadow: none;
+  border: 1px solid #bfdbfe;
 }
 
 .btn-acao-editar:hover {
-  background-color: var(--ifg-green-dark);
+  background-color: #bfdbfe;
+  color: #1e3a8a;
   transform: translateY(-1px);
 }
 
@@ -497,7 +488,6 @@ tbody::before {
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
-  /* Works fine on div */
 }
 
 thead tr {
