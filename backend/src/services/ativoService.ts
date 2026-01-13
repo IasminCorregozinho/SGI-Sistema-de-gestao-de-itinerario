@@ -1,5 +1,4 @@
 /**
- * Camada de Serviço
  * Responsável por validar as regras de negócio, orquestrar chamadas ao banco de dados
  * e garantir a integridade dos dados (como registrar histórico automaticamente).
  */
@@ -86,25 +85,58 @@ export async function atualizarAtivo(
   // Gera um registro de alterações detalhado para campos não rastreados por colunas específicas
   const changes: string[] = [];
 
-  if (dadosNovos.patrimonio && dadosNovos.patrimonio !== ativoAntigo.patrimonio) {
-    changes.push(`Patrimônio: ${ativoAntigo.patrimonio} -> ${dadosNovos.patrimonio}`);
+  if (
+    dadosNovos.patrimonio &&
+    dadosNovos.patrimonio !== ativoAntigo.patrimonio
+  ) {
+    changes.push(
+      `Patrimônio: ${ativoAntigo.patrimonio} -> ${dadosNovos.patrimonio}`
+    );
   }
-  if (dadosNovos.marca_modelo && dadosNovos.marca_modelo !== ativoAntigo.marca_modelo) {
-    changes.push(`Marca/Modelo: ${ativoAntigo.marca_modelo || ''} -> ${dadosNovos.marca_modelo}`);
+  if (
+    dadosNovos.marca_modelo &&
+    dadosNovos.marca_modelo !== ativoAntigo.marca_modelo
+  ) {
+    changes.push(
+      `Marca/Modelo: ${ativoAntigo.marca_modelo || ""} -> ${
+        dadosNovos.marca_modelo
+      }`
+    );
   }
-  if (dadosNovos.numero_serie && dadosNovos.numero_serie !== ativoAntigo.numero_serie) {
-    changes.push(`Nº Série: ${ativoAntigo.numero_serie || ''} -> ${dadosNovos.numero_serie}`);
+  if (
+    dadosNovos.numero_serie &&
+    dadosNovos.numero_serie !== ativoAntigo.numero_serie
+  ) {
+    changes.push(
+      `Nº Série: ${ativoAntigo.numero_serie || ""} -> ${
+        dadosNovos.numero_serie
+      }`
+    );
   }
-  if (dadosNovos.tipo_armazenamento && dadosNovos.tipo_armazenamento !== ativoAntigo.tipo_armazenamento) {
-    changes.push(`Armazenamento: ${ativoAntigo.tipo_armazenamento || ''} -> ${dadosNovos.tipo_armazenamento}`);
+  if (
+    dadosNovos.tipo_armazenamento &&
+    dadosNovos.tipo_armazenamento !== ativoAntigo.tipo_armazenamento
+  ) {
+    changes.push(
+      `Armazenamento: ${ativoAntigo.tipo_armazenamento || ""} -> ${
+        dadosNovos.tipo_armazenamento
+      }`
+    );
   }
-  if (dadosNovos.capacidade_armazenamento && dadosNovos.capacidade_armazenamento !== ativoAntigo.capacidade_armazenamento) {
-    changes.push(`Capacidade: ${ativoAntigo.capacidade_armazenamento || ''} -> ${dadosNovos.capacidade_armazenamento}`);
+  if (
+    dadosNovos.capacidade_armazenamento &&
+    dadosNovos.capacidade_armazenamento !== ativoAntigo.capacidade_armazenamento
+  ) {
+    changes.push(
+      `Capacidade: ${ativoAntigo.capacidade_armazenamento || ""} -> ${
+        dadosNovos.capacidade_armazenamento
+      }`
+    );
   }
 
   // Combinar a observação do usuário com as alterações geradas pelo sistema
   const userObs = dadosNovos.obs || (dadosNovos as any).observacao || "";
-  const systemChanges = changes.length > 0 ? changes.join(', ') : "";
+  const systemChanges = changes.length > 0 ? changes.join(", ") : "";
   const finalObs = userObs.trim();
 
   // Registra no histórico comparando o "Antigo" com o "Final"

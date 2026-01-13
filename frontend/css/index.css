@@ -45,7 +45,6 @@ body {
   /* Evita scroll no layout dividido */
 }
 
-/* Layout Principal Split-Screen */
 .main-container {
   display: flex;
   width: 100%;
@@ -127,13 +126,9 @@ body {
   display: block;
   object-fit: contain;
   border-radius: 12px;
-  /* Arredondamento mais suave */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  /* Sombra mais destacada */
   background-color: var(--white);
-  /* Fundo branco para destaque */
   padding: 15px;
-  /* Respiro interno */
 }
 
 .welcome-text h1 {

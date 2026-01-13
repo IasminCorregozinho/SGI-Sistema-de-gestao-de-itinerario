@@ -1,4 +1,3 @@
-// App Configuration
 // * Configura a aplicação Express, middlewares e rotas principais.
 
 import express from "express";
