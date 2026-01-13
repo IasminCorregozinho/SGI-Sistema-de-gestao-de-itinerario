@@ -37,7 +37,7 @@ O projeto foi construído utilizando uma arquitetura moderna e fortemente tipada
 * **Node.js & TypeScript:** Base sólida para o servidor.
 * **Express:** Framework para gerenciamento de rotas e requisições HTTP.
 * **Arquitetura MVC + Services + Repository:** Estrutura organizada para separação de responsabilidades (ver detalhes abaixo).
-* **Database:** SQL (Integração via Drivers/ORM).
+* **Database:** PostgreSQL (Integração via pgAdmin4).
 
 ### Front-end
 * **HTML5 & CSS3:** Interface responsiva e estilizada.
