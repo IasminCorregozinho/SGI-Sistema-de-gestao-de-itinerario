@@ -12,16 +12,20 @@ O **SGI (Sistema de Gestão de Itinerário)** é uma solução robusta desenvolv
 Painel de controle com indicadores (KPIs) em tempo real, exibindo total de ativos, itens em estoque, manutenção e descartados, além de gráficos de distribuição por categoria e status.
 
 ![Dashboard SGI](./SGI_images/Tela_de_Dashboard.png)
+![Dashboard SGI](./SGI_images/Tela_de_Dashboard_Menu.png)
 
 ### 🔐 Controle de Acesso e Login
 Sistema de autenticação seguro via matrícula e senha, com diferenciação de permissões entre **Suporte** e **Coordenação**.
 
 ![Login SGI](./SGI_images/Tela_de_Login.png)
+![Login SGI](./SGI_images/Tela_de_Dashboard_Modal_Gerenciar_Perfis.png)
 
 ### 📋 Listagem e Inventário
 Visualização tabular completa com filtros dinâmicos (Patrimônio, Status, Localização), paginação e exportação de relatórios.
 
 ![Listagem de Ativos](./SGI_images/Tela_de_Listagem_de_Ativos.png)
+![Listagem de Ativos](./SGI_images/Tela_de_Listagem_Modal_de_Historico_de_ativos.png)
+![Listagem de Ativos](./SGI_images/Tela_de_Listagem_Modal_Editar_Ativos.png)
 
 ---
 
