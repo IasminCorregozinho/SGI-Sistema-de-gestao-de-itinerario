@@ -49,7 +49,6 @@ export async function cadastrarAtivo(dados: Ativo, usuarioId: number = 1) {
 }
 
 // Lista todos os ativos da base de dados. @returns Array com todos os ativos.
-
 export async function listarAtivos() {
   return await ativoRepo.buscarTodos();
 }
