@@ -41,7 +41,7 @@ O projeto foi construído utilizando uma arquitetura moderna e fortemente tipada
 
 ### Front-end
 * **HTML5 & CSS3:** Interface responsiva e estilizada.
-* **JavaScript:** Lógica de interação no cliente e consumo de APIs.
+* **JavaScript:** Lógica de interatividade.
 
 ---
 
