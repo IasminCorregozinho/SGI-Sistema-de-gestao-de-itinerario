@@ -1,9 +1,3 @@
-Parabéns pela conclusão do SGI! 🚀 Com base na análise minuciosa da estrutura de arquivos (que demonstra uma arquitetura limpa e escalável), nas telas desenvolvidas (que mostram uma interface polida e funcional) e no Documento de Requisitos (que detalha as regras de negócio e fluxos), elaborei um **README.md** profissional.
-
-Este documento foi estruturado para destacar a complexidade técnica do back-end (sua responsabilidade) e a integridade da solução completa.
-
-Aqui está o código Markdown pronto para você copiar e colar no seu repositório:
-
 ```markdown
 # SGI - Sistema de Gestão de Itinerário
 
@@ -104,7 +98,7 @@ src/
 
 1. **Clone o repositório**
 ```bash
-git clone [https://github.com/FabianaSanves/SGI-Project.git](https://github.com/FabianaSanves/SGI-Project.git)
+git clone [https://github.com/IasminCorregozinho/SGI-Sistema-de-gestao-de-itinerario.git](https://github.com/IasminCorregozinho/SGI-Sistema-de-gestao-de-itinerario.git)
 
 ```
 
