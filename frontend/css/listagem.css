@@ -594,7 +594,6 @@ tbody tr:hover {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #cccccc #f1f1f1;
-  /* Light Gray Standard */
 }
 
 .modal-box::-webkit-scrollbar {
@@ -857,7 +856,6 @@ tbody tr:hover {
   }
 }
 
-/* Close Button */
 .close-btn {
   position: absolute;
   top: 15px;
