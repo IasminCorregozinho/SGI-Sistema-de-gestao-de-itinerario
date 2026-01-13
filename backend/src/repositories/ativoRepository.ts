@@ -71,24 +71,24 @@ export async function buscarTodos(): Promise<Ativo[]> {
 
   return result.rows.map(
     (row) =>
-    ({
-      id: row.ativo_id,
-      patrimonio: row.patrimonio,
-      id_tipo_ativo: row.tipo_ativo,
-      id_status: row.status,
-      id_localizacao: row.localizacao,
-      id_responsavel: row.responsavel,
-      marca_modelo: row.marca_modelo,
-      numero_serie: row.numero_serie,
-      obs: row.observacoes,
-      tipo_armazenamento: row.tipo_armazenamento,
-      capacidade_armazenamento: row.capacidade_armazenamento,
-      valor_manutencao: row.valor_manutencao,
-      status_nome: row.status_nome,
-      tipo_ativo_nome: row.tipo_ativo_nome,
-      localizacao_nome: row.localizacao_nome,
-      responsavel_nome: row.responsavel_nome,
-    } as Ativo)
+      ({
+        id: row.ativo_id,
+        patrimonio: row.patrimonio,
+        id_tipo_ativo: row.tipo_ativo,
+        id_status: row.status,
+        id_localizacao: row.localizacao,
+        id_responsavel: row.responsavel,
+        marca_modelo: row.marca_modelo,
+        numero_serie: row.numero_serie,
+        obs: row.observacoes,
+        tipo_armazenamento: row.tipo_armazenamento,
+        capacidade_armazenamento: row.capacidade_armazenamento,
+        valor_manutencao: row.valor_manutencao,
+        status_nome: row.status_nome,
+        tipo_ativo_nome: row.tipo_ativo_nome,
+        localizacao_nome: row.localizacao_nome,
+        responsavel_nome: row.responsavel_nome,
+      } as Ativo)
   );
 }
 
@@ -166,7 +166,6 @@ export async function registrarHistorico(hist: HistoricoAtivo): Promise<void> {
   ]);
 }
 
-// FUNÇÃO DO DASHBOARD
 // Calcula os KPIs (Indicadores) principais para o Dashboard.
 // Retorna: Total de ativos, Total em Estoque, Total em Manutenção e Total Descartado.
 export async function obterDadosDashboard() {

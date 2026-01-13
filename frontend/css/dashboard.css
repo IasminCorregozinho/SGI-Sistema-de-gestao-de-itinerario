@@ -205,7 +205,6 @@ header p {
   border: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-width: 0;
-  /* Impede que o card force o container grid a expandir */
 }
 
 .card:hover {
@@ -257,10 +256,8 @@ header p {
   height: 350px;
   background: #f9f9f9;
   display: block;
-  /* Flexbox atrapalha o resize do Chart.js */
   position: relative;
   overflow: hidden;
-  /* Garante que o canvas não vaze */
   border-radius: 8px;
   color: #999;
 }
@@ -662,9 +659,7 @@ tbody tr:hover {
   font-family: var(--font-heading);
   margin-bottom: 2rem;
   color: var(--ifg-green);
-  /* Verde IFG */
   text-align: center;
-  /* Centralizado */
   font-weight: 700;
   position: relative;
   z-index: 1;
@@ -728,9 +723,7 @@ tbody tr:hover {
 
 .modal-box .btn-salvar {
   width: fit-content !important;
-  /* Ajuste EXATO ao texto */
   min-width: 0 !important;
-  /* Remove restrição mínima */
   grid-column: span 2;
   margin: 20px auto 10px auto !important;
   display: flex !important;
@@ -738,7 +731,6 @@ tbody tr:hover {
   align-items: center;
   gap: 10px;
   padding: 10px 24px !important;
-  /* Padding equilibrado */
   background-color: var(--ifg-green) !important;
   color: var(--white) !important;
   border: none !important;
@@ -767,13 +759,11 @@ tbody tr:hover {
   grid-column: span 2;
   margin: 10px auto 0 auto !important;
   display: flex;
-  /* Remove !important to allow JS toggle */
   justify-content: center;
   align-items: center;
   gap: 10px;
   padding: 10px 24px !important;
   background-color: #6c757d !important;
-  /* Gray */
   color: var(--white) !important;
   border: none !important;
   border-radius: 8px !important;
