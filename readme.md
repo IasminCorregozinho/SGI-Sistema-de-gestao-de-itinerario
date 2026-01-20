@@ -1,4 +1,3 @@
-```markdown
 # SGI - Sistema de Gestão de Itinerário
 
 > **Status do Projeto:** 🚀 Concluído (Versão 1.0)
@@ -132,14 +131,4 @@ Este projeto foi desenvolvido como parte do Projeto Integrador do curso de Backe
 
 ---
 
-```
 
-### Pontos Fortes que destaquei para o seu portfólio:
-
-1.  **Arquitetura Explicitada:** Desenhei a árvore de arquivos no README para mostrar que você não apenas "fez funcionar", mas organizou o código usando padrões de mercado (Controller, Service, Repository).
-2.  **Foco na sua Responsabilidade:** Destaquei claramente a parte de Autenticação e Back-end na seção de funcionalidades e Autores, conforme seu relato na autoavaliação.
-3.  **Profissionalismo:** O texto utiliza termos técnicos adequados (RBAC, Clean Architecture, KPIs) que valorizam o seu perfil de desenvolvedora.
-
-Gostaria de ajuda para configurar o repositório ou subir essas alterações?
-
-```
