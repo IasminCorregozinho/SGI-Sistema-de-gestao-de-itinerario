@@ -105,7 +105,7 @@ git clone [https://github.com/IasminCorregozinho/SGI-Sistema-de-gestao-de-itiner
 
 2. **Instale as dependências**
 ```bash
-cd SGI-Project
+cd SGI-Sistema-de-gestao-de-itinerario
 npm install
 
 ```
@@ -126,7 +126,7 @@ O servidor iniciará (padrão: `http://localhost:3000`).
 
 ## 👩‍💻 Autores e Contribuições
 
-Este projeto foi desenvolvido como parte do Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas (IFG).
+Este projeto foi desenvolvido como parte do Projeto Integrador do curso de Backend Node.js (IFG).
 
 * **Fabiana Chaves e Iasmin Corregozinho:** Back-end Developer (Foco: Arquitetura, Lógica de Autenticação/Login, Gestão de Acesso e Integração de Banco de Dados).
 
